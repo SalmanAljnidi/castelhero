@@ -21,9 +21,9 @@
             --accent-correct: #2ecc71;
             --accent-wrong: #e74c3c;
             --gold: #f1c40f;
+            --ice: #00d2ff;
             --bg-sky-top: #3498db;
             --bg-sky-bot: #87CEEB;
-            --bg-ground: #27ae60;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -71,7 +71,6 @@
             margin: 10px; cursor: pointer; font-family: 'Cairo', sans-serif;
             box-shadow: 0 5px 0 #1e8449, 0 10px 10px rgba(0,0,0,0.2); 
             transition: all 0.1s; width: 90%; max-width: 350px; font-weight: bold;
-            text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
         }
         .btn:active { transform: translateY(5px); box-shadow: none; }
         .btn-blue { background: linear-gradient(to bottom, #3498db, #2980b9); box-shadow: 0 5px 0 #20638f; }
@@ -84,27 +83,48 @@
         #game-container { display: flex; flex-direction: column; height: 100%; }
         
         #game-view {
-            flex: 1; position: relative; /* يأخذ المساحة المتاحة */
+            flex: 1; position: relative;
             background: linear-gradient(to bottom, var(--bg-sky-top), var(--bg-sky-bot));
             overflow: hidden;
             box-shadow: inset 0 -10px 20px rgba(0,0,0,0.1);
         }
+        /* تأثير التجميد */
+        #game-view.frozen::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 210, 255, 0.3); pointer-events: none;
+            box-shadow: inset 0 0 50px var(--ice);
+            animation: pulseIce 1s infinite;
+        }
+        @keyframes pulseIce { 0% {opacity:0.5} 50% {opacity:0.8} 100% {opacity:0.5} }
+
         canvas { width: 100%; height: 100%; display: block; }
 
         #hud {
             position: absolute; top: 10px; left: 10px; right: 10px;
-            display: flex; justify-content: space-between;
-            font-size: 1.3rem; color: white; text-shadow: 2px 2px 0 #000;
-            pointer-events: none; background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 20px;
-            border: 2px solid rgba(255,255,255,0.2);
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 1.2rem; color: white; text-shadow: 2px 2px 0 #000;
+            pointer-events: none; z-index: 20;
         }
+        .hud-group { display: flex; gap: 15px; background: rgba(0,0,0,0.4); padding: 5px 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); }
+
+        /* زر التجميد */
+        #freeze-btn {
+            pointer-events: auto;
+            background: linear-gradient(to bottom, #00d2ff, #3a7bd5);
+            border: 2px solid white;
+            color: white; padding: 5px 15px; border-radius: 20px;
+            font-weight: bold; font-family: 'Cairo'; cursor: pointer;
+            display: flex; align-items: center; gap: 5px;
+            box-shadow: 0 4px 0 #005cbf; transition: 0.1s;
+        }
+        #freeze-btn:active { transform: translateY(4px); box-shadow: none; }
+        #freeze-btn:disabled { filter: grayscale(1); opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
 
         #controls-area {
-            height: auto; /* ارتفاع تلقائي */
-            min-height: 35vh; /* لكن لا يقل عن 35% من الشاشة */
+            height: auto; min-height: 35vh;
             background: var(--secondary);
             padding: 15px 20px calc(20px + env(safe-area-inset-bottom)) 20px;
-            display: flex; flex-direction: column; justify-content: flex-start; gap: 15px;
+            display: flex; flex-direction: column; gap: 15px;
             border-top: 6px solid var(--primary); 
             box-shadow: 0 -10px 30px rgba(0,0,0,0.5); z-index: 10;
         }
@@ -125,7 +145,6 @@
             box-shadow: 0 6px 0 #bdc3c7; transition: transform 0.1s; font-family: 'Cairo', sans-serif; height: 100%;
         }
         .option-btn:active { transform: translateY(6px); box-shadow: none; }
-        .option-btn:disabled { opacity: 1; cursor: default; } /* Keep opacity so user sees result */
         
         .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake {
@@ -184,8 +203,13 @@
         <div id="game-view">
             <canvas id="game-canvas"></canvas>
             <div id="hud">
-                <div class="hud-item"><i class="fas fa-heart" style="color:#e74c3c"></i> <span class="arabic-num" id="lives-disp">٣</span></div>
-                <div class="hud-item"><i class="fas fa-star" style="color:var(--gold)"></i> <span class="arabic-num" id="score-disp">٠</span></div>
+                <div class="hud-group">
+                    <div><i class="fas fa-heart" style="color:#e74c3c"></i> <span class="arabic-num" id="lives-disp">٣</span></div>
+                    <div><i class="fas fa-star" style="color:var(--gold)"></i> <span class="arabic-num" id="score-disp">٠</span></div>
+                </div>
+                <button id="freeze-btn" onclick="activateFreeze()">
+                    <i class="fas fa-snowflake"></i> تجميد (<span class="arabic-num" id="freeze-count">٣</span>)
+                </button>
             </div>
         </div>
         <div id="controls-area">
@@ -202,7 +226,7 @@
     </div>
 
     <script>
-        // --- إعداد التثبيت ---
+        // إعداد التثبيت
         const manifestData = {
             "name": "حارس القلعة", "short_name": "القلعة", "start_url": ".",
             "display": "standalone", "background_color": "#2c3e50", "theme_color": "#2c3e50",
@@ -212,7 +236,7 @@
         const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
         document.getElementById('manifest-placeholder').href = URL.createObjectURL(blob);
 
-        // --- نظام الصوت (Sound System) ---
+        // الصوت
         let audioCtx;
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -226,47 +250,27 @@
             osc.connect(gainNode);
             gainNode.connect(audioCtx.destination);
 
-            if (type === 'correct') { // Ding!
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(500, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.1);
-                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-            } else if (type === 'wrong') { // Buzz
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-                osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.2);
-                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-            } else if (type === 'shoot') { // Pew
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.15);
-                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.15);
-            } else if (type === 'explosion') { // Boom
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(100, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            if (type === 'correct') { 
+                osc.type = 'sine'; osc.frequency.setValueAtTime(500, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.1); gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'wrong') { 
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime); osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.2); gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'freeze') { // صوت التجميد
+                osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime); osc.frequency.linearRampToValueAtTime(200, audioCtx.currentTime + 1); gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 1); osc.start(); osc.stop(audioCtx.currentTime + 1);
             }
         }
 
-        // --- المتغيرات الأساسية ---
+        // المتغيرات
         const canvas = document.getElementById('game-canvas');
         const ctx = canvas.getContext('2d');
         let gameMode = 'lower';
         let score = 0, lives = 3, coins = 0;
+        let freezeCount = 3; // عدد مرات التجميد
+        let isFrozen = false; // حالة التجميد
         let currentAnswer = 0;
         let gameState = 'start';
         let difficulty = 1;
         
-        let savedData = JSON.parse(localStorage.getItem('mathHero_v5')) || { coins: 0, boughtSkins: ['👮‍♂️'], currentSkin: '👮‍♂️' };
+        let savedData = JSON.parse(localStorage.getItem('mathHero_v6')) || { coins: 0, boughtSkins: ['👮‍♂️'], currentSkin: '👮‍♂️' };
         coins = savedData.coins;
 
         const shopItems = [
@@ -280,7 +284,7 @@
         let particles = [];
         let clouds = [];
         let lastSpawnTime = 0;
-        let spawnInterval = 2500;
+        let spawnInterval = 3500; // زدنا الوقت بين الوحوش ليعطي راحة
         let groundLevel = 0;
 
         function toArabicNum(num) {
@@ -292,38 +296,30 @@
             if(container) {
                 canvas.width = container.clientWidth;
                 canvas.height = container.clientHeight;
-                groundLevel = canvas.height * 0.75; // الأرض عند 75% من الشاشة
-                
-                // تصحيح مواقع الكائنات الحالية عند تغيير حجم الشاشة
+                groundLevel = canvas.height * 0.75;
                 hero.y = groundLevel + 5;
                 enemies.forEach(e => e.y = groundLevel + 5);
             }
         }
         window.addEventListener('resize', resizeCanvas);
 
-        // --- تهيئة البيئة ---
+        // --- البيئة ---
         function initClouds() {
             clouds = [];
             for(let i=0; i<5; i++) {
                 clouds.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * (canvas.height/2),
-                    speed: 0.2 + Math.random() * 0.3,
-                    size: 30 + Math.random() * 40
+                    x: Math.random() * canvas.width, y: Math.random() * (canvas.height/2),
+                    speed: 0.1 + Math.random() * 0.2, size: 30 + Math.random() * 40
                 });
             }
         }
 
         function drawEnvironment() {
-            // السماء (متدرجة في CSS)
-            
-            // الشمس
             ctx.fillStyle = '#f1c40f';
             ctx.shadowBlur = 20; ctx.shadowColor = 'orange';
             ctx.beginPath(); ctx.arc(canvas.width - 50, 50, 30, 0, Math.PI*2); ctx.fill();
             ctx.shadowBlur = 0;
 
-            // السحب
             ctx.fillStyle = 'rgba(255,255,255,0.7)';
             clouds.forEach(c => {
                 c.x -= c.speed;
@@ -335,52 +331,33 @@
                 ctx.fill();
             });
 
-            // الأرض
-            ctx.fillStyle = '#27ae60';
-            ctx.fillRect(0, groundLevel, canvas.width, canvas.height - groundLevel);
-            // تفاصيل العشب
-            ctx.fillStyle = '#2ecc71';
-            ctx.fillRect(0, groundLevel, canvas.width, 10);
-            
-            // القلعة
+            ctx.fillStyle = '#27ae60'; ctx.fillRect(0, groundLevel, canvas.width, canvas.height - groundLevel);
+            ctx.fillStyle = '#2ecc71'; ctx.fillRect(0, groundLevel, canvas.width, 10);
             drawCastle();
         }
 
         function drawCastle() {
-            const w = Math.min(canvas.width * 0.3, 150); // لا تكبر زيادة
+            const w = Math.min(canvas.width * 0.3, 150);
             const h = canvas.height * 0.45;
             const x = 10;
             const base = groundLevel;
 
-            // الظل
             ctx.fillStyle = 'rgba(0,0,0,0.2)';
             ctx.beginPath(); ctx.ellipse(x + w/2, base, w/2, 10, 0, 0, Math.PI*2); ctx.fill();
 
-            // البرج الرئيسي
-            ctx.fillStyle = '#7f8c8d';
-            ctx.fillRect(x, base - h + 30, w, h - 30);
-            
-            // تفاصيل الطوب
+            ctx.fillStyle = '#7f8c8d'; ctx.fillRect(x, base - h + 30, w, h - 30);
             ctx.fillStyle = '#95a5a6';
-            for(let i=0; i<5; i++) {
-                ctx.fillRect(x + (Math.random()*w), base - (Math.random()*h), 10, 5);
-            }
+            for(let i=0; i<5; i++) ctx.fillRect(x + (Math.random()*w), base - (Math.random()*h), 10, 5);
 
-            // الشرفات
             ctx.fillStyle = '#34495e';
             ctx.fillRect(x - 5, base - h + 20, w + 10, 15);
-            for(let i=0; i<4; i++) {
-                ctx.fillRect(x + (i * (w/3.5)), base - h, w/5, 20);
-            }
+            for(let i=0; i<4; i++) ctx.fillRect(x + (i * (w/3.5)), base - h, w/5, 20);
 
-            // البوابة
             ctx.fillStyle = '#4e342e';
             ctx.beginPath(); ctx.arc(x + w/2, base, w/3, Math.PI, 0); ctx.fill();
-            // حديد البوابة
             ctx.strokeStyle = '#2c3e50'; ctx.lineWidth = 3;
             ctx.beginPath(); ctx.moveTo(x+w/2, base-w/3); ctx.lineTo(x+w/2, base); ctx.stroke();
             
-            // العلم
             const flagY = base - h;
             ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
             ctx.beginPath(); ctx.moveTo(x + w/2, flagY); ctx.lineTo(x + w/2, flagY - 40); ctx.stroke();
@@ -388,25 +365,38 @@
             ctx.beginPath(); ctx.moveTo(x + w/2, flagY - 40); ctx.lineTo(x + w + 20, flagY - 30); ctx.lineTo(x + w/2, flagY - 20); ctx.fill();
         }
 
-        // --- اللعبة ---
+        // --- منطق اللعبة ---
         function initAudioAndStart() {
-            initAudio(); // تشغيل السياق الصوتي
-            startGame();
+            initAudio(); startGame();
         }
 
         function startGame() {
             gameState = 'playing';
-            score = 0; lives = 3; difficulty = 1; spawnInterval = 2500;
+            score = 0; lives = 3; difficulty = 1; spawnInterval = 3500;
+            freezeCount = 3; isFrozen = false; // إعادة تعيين التجميد
             enemies = []; particles = [];
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('game-container').classList.remove('hidden');
-            
-            // فرض تحديث الأحجام فوراً
-            resizeCanvas();
-            initClouds();
-            updateHUD();
-            generateNewQuestion();
-            gameLoop(0);
+            resizeCanvas(); initClouds(); updateHUD(); generateNewQuestion(); gameLoop(0);
+        }
+
+        // دالة تفعيل التجميد
+        function activateFreeze() {
+            if (freezeCount > 0 && !isFrozen && gameState === 'playing') {
+                freezeCount--;
+                isFrozen = true;
+                playSound('freeze');
+                updateHUD();
+                
+                // إضافة تأثير بصري
+                document.getElementById('game-view').classList.add('frozen');
+
+                // إلغاء التجميد بعد 5 ثواني
+                setTimeout(() => {
+                    isFrozen = false;
+                    document.getElementById('game-view').classList.remove('frozen');
+                }, 5000);
+            }
         }
 
         function updateHUD() {
@@ -414,37 +404,38 @@
                 if(el.id.includes('score')) el.innerText = toArabicNum(score);
                 if(el.id.includes('lives')) el.innerText = toArabicNum(lives);
                 if(el.id.includes('coins')) el.innerText = toArabicNum(coins);
+                if(el.id === 'freeze-count') el.innerText = toArabicNum(freezeCount);
             });
-            localStorage.setItem('mathHero_v5', JSON.stringify({ coins, boughtSkins: savedData.boughtSkins, currentSkin: savedData.currentSkin }));
+            
+            // تحديث حالة زر التجميد
+            const fBtn = document.getElementById('freeze-btn');
+            if (freezeCount <= 0 || isFrozen) fBtn.disabled = true;
+            else fBtn.disabled = false;
+
+            localStorage.setItem('mathHero_v6', JSON.stringify({ coins, boughtSkins: savedData.boughtSkins, currentSkin: savedData.currentSkin }));
         }
 
         function generateNewQuestion() {
             let n1, n2, op, vis = '';
-            
             if (gameMode === 'lower') {
-                if (Math.random() > 0.5) { // جمع
-                    n1 = Math.floor(Math.random() * 6);
-                    n2 = Math.floor(Math.random() * (11 - n1));
+                if (Math.random() > 0.5) {
+                    n1 = Math.floor(Math.random() * 6); n2 = Math.floor(Math.random() * (11 - n1));
                     currentAnswer = n1 + n2;
                     document.getElementById('q-text').innerText = `${toArabicNum(n1)} + ${toArabicNum(n2)} = ؟`;
                     vis = drawDots(n1) + '<span style="font-size:1.5rem">+</span>' + drawDots(n2);
-                } else { // طرح
-                    n1 = Math.floor(Math.random() * 11);
-                    n2 = Math.floor(Math.random() * (n1 + 1));
+                } else {
+                    n1 = Math.floor(Math.random() * 11); n2 = Math.floor(Math.random() * (n1 + 1));
                     currentAnswer = n1 - n2;
                     document.getElementById('q-text').innerText = `${toArabicNum(n1)} − ${toArabicNum(n2)} = ؟`;
                     vis = drawDots(n1);
                 }
             } else {
-                if (Math.random() > 0.5) { // ضرب
-                    n1 = Math.floor(Math.random() * 11);
-                    n2 = Math.floor(Math.random() * 11);
+                if (Math.random() > 0.5) {
+                    n1 = Math.floor(Math.random() * 11); n2 = Math.floor(Math.random() * 11);
                     currentAnswer = n1 * n2;
                     document.getElementById('q-text').innerText = `${toArabicNum(n1)} × ${toArabicNum(n2)} = ؟`;
-                } else { // قسمة
-                    n2 = Math.floor(Math.random() * 9) + 1;
-                    currentAnswer = Math.floor(Math.random() * 11);
-                    n1 = n2 * currentAnswer;
+                } else {
+                    n2 = Math.floor(Math.random() * 9) + 1; currentAnswer = Math.floor(Math.random() * 11); n1 = n2 * currentAnswer;
                     document.getElementById('q-text').innerText = `${toArabicNum(n1)} ÷ ${toArabicNum(n2)} = ؟`;
                 }
             }
@@ -465,8 +456,6 @@
                 b.style.transform = 'scale(1)';
                 b.style.backgroundColor = '#ecf0f1';
                 b.style.color = 'var(--primary)';
-                b.style.borderColor = 'transparent';
-                b.style.border = 'none';
             });
         }
 
@@ -480,85 +469,52 @@
             try {
                 let val = parseInt(btn.getAttribute('data-val'));
                 const allBtns = document.querySelectorAll('.option-btn');
-                
-                // منع النقر المتكرر
                 if(btn.disabled) return;
                 allBtns.forEach(b => b.disabled = true);
                 
                 if(val === currentAnswer) {
-                    btn.style.backgroundColor = '#2ecc71';
-                    btn.style.color = 'white';
-                    btn.style.transform = 'scale(1.1)';
-                    playSound('correct');
-                    score += 10; coins += 2;
-                    
-                    // إطلاق مقذوف (بصري فقط)
+                    btn.style.backgroundColor = '#2ecc71'; btn.style.color = 'white'; btn.style.transform = 'scale(1.1)';
+                    playSound('correct'); score += 10; coins += 2;
                     fireProjectile();
-
-                    if(enemies.length > 0) { 
-                        // تأخير الانفجار قليلاً ليتزامن مع المقذوف
-                        setTimeout(() => {
-                            if(enemies[0]) {
-                                createExplosion(enemies[0].x, enemies[0].y); 
-                                enemies.shift();
-                                playSound('explosion');
-                            }
-                        }, 200);
-                    }
-                    updateHUD();
-                    setTimeout(generateNewQuestion, 800);
+                    setTimeout(() => {
+                        if(enemies.length > 0) { createExplosion(enemies[0].x, enemies[0].y); enemies.shift(); playSound('explosion'); }
+                    }, 200);
+                    updateHUD(); setTimeout(generateNewQuestion, 800);
                 } else {
-                    btn.style.backgroundColor = '#e74c3c';
-                    btn.style.color = 'white';
+                    btn.style.backgroundColor = '#e74c3c'; btn.style.color = 'white';
                     playSound('wrong');
                     document.getElementById('controls-area').classList.add('shake');
                     setTimeout(() => {
                         document.getElementById('controls-area').classList.remove('shake');
                         allBtns.forEach(b => { 
-                            b.disabled = false; 
-                            b.style.backgroundColor = '#ecf0f1'; 
-                            b.style.color = 'var(--primary)'; 
-                            b.style.transform = 'scale(1)';
+                            b.disabled = false; b.style.backgroundColor = '#ecf0f1'; b.style.color = 'var(--primary)'; b.style.transform = 'scale(1)';
                         });
                     }, 500);
                 }
-            } catch (e) {
-                console.error(e);
-            }
+            } catch (e) { console.error(e); }
         }
 
         function fireProjectile() {
-            // رسم كرة نار سريعة من البطل
-            let projX = canvas.width * 0.15;
-            let projY = groundLevel - 30;
-            let targetX = enemies.length > 0 ? enemies[0].x : canvas.width;
-            
-            // هنا مجرد تأثير بصري سريع
-            ctx.fillStyle = 'orange';
-            ctx.beginPath(); ctx.arc(projX, projY, 10, 0, Math.PI*2); ctx.fill();
+            let projX = canvas.width * 0.15; let projY = groundLevel - 30;
+            ctx.fillStyle = 'orange'; ctx.beginPath(); ctx.arc(projX, projY, 10, 0, Math.PI*2); ctx.fill();
         }
 
         function gameLoop(t) {
             if(gameState !== 'playing') return;
             ctx.clearRect(0,0,canvas.width,canvas.height);
-            
             drawEnvironment();
 
-            // رسم البطل
-            ctx.font = `${canvas.height * 0.15}px Cairo`;
-            ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 10;
-            ctx.textAlign = 'center';
-            ctx.fillText(hero.sprite, canvas.width * 0.15, groundLevel + 5);
+            ctx.font = `${canvas.height * 0.15}px Cairo`; ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 10;
+            ctx.textAlign = 'center'; ctx.fillText(hero.sprite, canvas.width * 0.15, groundLevel + 5);
             ctx.shadowBlur = 0;
 
-            // إضافة وحوش (مع التأكد من الموقع الصحيح)
             if(t - lastSpawnTime > spawnInterval) {
-                let baseSpeed = 1.5; 
-                let screenFactor = canvas.width > 800 ? 0.001 : 0.003; 
+                // تقليل السرعة بشكل كبير (0.4 بدلاً من 1.5)
+                let baseSpeed = 0.4; 
+                let screenFactor = canvas.width > 800 ? 0.0005 : 0.0015; 
                 
                 enemies.push({
-                    x: canvas.width + 50,
-                    y: groundLevel + 5, // استخدام GroundLevel الحالي دائماً
+                    x: canvas.width + 50, y: groundLevel + 5,
                     speed: (canvas.width * screenFactor + baseSpeed) * difficulty,
                     sprite: ['👾','👺','👹','🐉','🦖'][Math.floor(Math.random()*5)],
                     walkOffset: 0
@@ -566,19 +522,21 @@
                 lastSpawnTime = t;
             }
 
-            // حركة الوحوش
             for(let i=enemies.length-1; i>=0; i--) {
                 let e = enemies[i];
-                e.x -= e.speed;
-                e.walkOffset += 0.2;
-                let bounce = Math.sin(e.walkOffset) * 5; // حركة المشي
                 
+                // إذا لم يكن اللعب مجمداً، حرك الوحوش
+                if (!isFrozen) {
+                    e.x -= e.speed;
+                    e.walkOffset += 0.1; // إبطاء حركة المشي أيضاً
+                }
+                
+                let bounce = Math.sin(e.walkOffset) * 5;
                 ctx.font = `${canvas.height * 0.12}px Cairo`;
                 ctx.fillText(e.sprite, e.x, e.y + bounce);
                 
                 if(e.x < canvas.width * 0.2) {
-                    enemies.splice(i,1); lives--; updateHUD();
-                    playSound('wrong');
+                    enemies.splice(i,1); lives--; updateHUD(); playSound('wrong');
                     document.getElementById('game-view').classList.add('shake');
                     setTimeout(()=>document.getElementById('game-view').classList.remove('shake'), 400);
                     if(lives <= 0) {
@@ -589,27 +547,20 @@
                 }
             }
 
-            // انفجارات
             for(let i=particles.length-1; i>=0; i--) {
-                let p = particles[i];
-                p.x += p.vx; p.y += p.vy; p.life -= 0.04;
-                ctx.globalAlpha = p.life;
-                ctx.fillStyle = p.color;
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
+                let p = particles[i]; p.x += p.vx; p.y += p.vy; p.life -= 0.04;
+                ctx.globalAlpha = p.life; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
                 if(p.life<=0) particles.splice(i,1);
             }
             ctx.globalAlpha = 1;
-
             requestAnimationFrame(gameLoop);
         }
 
         function createExplosion(x, y) {
             for(let i=0; i<25; i++) {
                 particles.push({
-                    x: x, y: y - 20,
-                    vx: (Math.random()-0.5) * 15, vy: (Math.random()-0.5) * 15,
-                    life: 1, size: Math.random()*8+2,
-                    color: `hsl(${Math.random()*60 + 10}, 100%, 50%)` // ألوان نارية
+                    x: x, y: y - 20, vx: (Math.random()-0.5) * 15, vy: (Math.random()-0.5) * 15,
+                    life: 1, size: Math.random()*8+2, color: `hsl(${Math.random()*60 + 10}, 100%, 50%)`
                 });
             }
         }
@@ -622,15 +573,10 @@
                 div.className = `shop-item ${savedData.currentSkin === item.icon ? 'selected' : ''} ${!owned ? 'locked' : ''}`;
                 div.innerHTML = `<div class="shop-icon">${item.icon}</div><div>${owned ? '✔' : toArabicNum(item.price)}</div>`;
                 div.onclick = () => {
-                    if(owned) { 
-                        savedData.currentSkin = item.icon; hero.sprite = item.icon; 
-                        renderShop(); updateHUD(); 
-                    }
+                    if(owned) { savedData.currentSkin = item.icon; hero.sprite = item.icon; renderShop(); updateHUD(); }
                     else if(coins >= item.price) {
-                        coins -= item.price; savedData.boughtSkins.push(item.icon);
-                        savedData.currentSkin = item.icon; hero.sprite = item.icon;
-                        playSound('correct');
-                        renderShop(); updateHUD();
+                        coins -= item.price; savedData.boughtSkins.push(item.icon); savedData.currentSkin = item.icon; hero.sprite = item.icon;
+                        playSound('correct'); renderShop(); updateHUD();
                     }
                 }
                 c.appendChild(div);
@@ -640,7 +586,6 @@
         function closeShop() { document.getElementById('shop-screen').classList.add('hidden'); document.getElementById('start-screen').classList.remove('hidden'); }
         function setMode(m) { gameMode = m; document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active')); document.getElementById('mode-'+m).classList.add('active'); }
         function resetGame() { document.getElementById('game-over-screen').classList.add('hidden'); startGame(); }
-
     </script>
 </body>
 </html>
