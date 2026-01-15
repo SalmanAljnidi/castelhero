@@ -2,8 +2,15 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>حارس القلعة الحسابية | سلمان الجنيدي</title>
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="manifest" id="manifest-placeholder">
+
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -15,7 +22,7 @@
             --accent-wrong: #e74c3c;
             --gold: #f1c40f;
             --bg-sky: #87CEEB;
-            --bg-ground: #7f8c8d;
+            --bg-ground: #27ae60;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -25,13 +32,15 @@
             padding: 0;
             font-family: 'Cairo', sans-serif;
             background-color: var(--primary);
+            /* استخدام dvh لحل مشكلة أشرطة المتصفح في الجوال */
             height: 100vh;
+            height: 100dvh; 
             overflow: hidden;
             touch-action: manipulation;
             user-select: none;
         }
 
-        /* --- الشاشات والقوائم --- */
+        /* --- الشاشات --- */
         .screen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -49,23 +58,24 @@
         .hidden { display: none !important; }
 
         h1 {
-            font-size: 2.5rem; margin: 0 0 10px 0;
-            color: var(--gold); text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 2.2rem; margin: 0 0 15px 0;
+            color: var(--gold); text-shadow: 3px 3px 0 rgba(0,0,0,0.3);
             font-weight: 800;
         }
         
         .credits-box {
-            background: rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.3);
             padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            width: 100%;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            width: 90%;
             max-width: 400px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .credits-name { font-size: 1.1rem; margin-bottom: 10px; color: #ecf0f1; }
+        .credits-name { font-size: 1.1rem; margin-bottom: 10px; color: #ecf0f1; font-weight: bold; }
         .social-icons { display: flex; justify-content: center; gap: 25px; }
         .social-icons a {
-            color: white; font-size: 2rem; text-decoration: none;
+            color: white; font-size: 2.2rem; text-decoration: none;
             transition: transform 0.2s; display: inline-block;
         }
         .social-icons a:hover { transform: scale(1.2); }
@@ -74,79 +84,78 @@
 
         .btn {
             background: var(--accent-correct); color: white; border: none;
-            padding: 12px 30px; font-size: 1.3rem; border-radius: 50px;
+            padding: 12px 30px; font-size: 1.2rem; border-radius: 50px;
             margin: 8px; cursor: pointer; font-family: 'Cairo', sans-serif;
-            box-shadow: 0 4px 0 #27ae60; transition: all 0.1s; width: 85%; max-width: 350px; font-weight: bold;
+            box-shadow: 0 5px 0 #219150; transition: all 0.1s; width: 90%; max-width: 350px; font-weight: bold;
         }
-        .btn:active { transform: translateY(4px); box-shadow: none; }
-        .btn-blue { background: #3498db; box-shadow: 0 4px 0 #2980b9; }
-        .btn-gold { background: var(--gold); color: var(--primary); box-shadow: 0 4px 0 #c49f0c; }
+        .btn:active { transform: translateY(5px); box-shadow: none; }
+        .btn-blue { background: #3498db; box-shadow: 0 5px 0 #2980b9; }
+        .btn-gold { background: var(--gold); color: var(--primary); box-shadow: 0 5px 0 #c49f0c; }
 
-        .mode-select { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; max-width: 400px; justify-content: center;}
-        .mode-btn { flex: 1; padding: 10px; opacity: 0.5; transition: 0.3s; border: 3px solid transparent; }
+        .mode-select { display: flex; gap: 10px; margin-bottom: 20px; width: 90%; max-width: 400px; }
+        .mode-btn { flex: 1; padding: 10px; opacity: 0.6; transition: 0.3s; border: 3px solid transparent; font-size: 1rem; }
         .mode-btn.active { opacity: 1; border-color: var(--gold); transform: scale(1.05); }
 
-        /* --- حاوية اللعبة الرئيسية --- */
+        /* --- اللعبة --- */
         #game-container {
             display: flex;
             flex-direction: column;
             height: 100%;
         }
 
-        /* قسم الكانفاس (الجزء العلوي) */
         #game-view {
-            flex: 3; /* يأخذ 3/5 من الشاشة */
+            flex: 5; /* مساحة أكبر للرسم */
             position: relative;
-            background: linear-gradient(to bottom, var(--bg-sky) 70%, var(--bg-ground) 70%);
+            background: linear-gradient(to bottom, var(--bg-sky) 60%, var(--bg-ground) 60%);
             overflow: hidden;
         }
         canvas { width: 100%; height: 100%; display: block; }
 
-        /* واجهة النقاط */
         #hud {
             position: absolute; top: 10px; left: 10px; right: 10px;
             display: flex; justify-content: space-between;
             font-size: 1.2rem; color: white; text-shadow: 1px 1px 2px #000;
             pointer-events: none;
+            background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 15px;
         }
-        .hud-item span { font-weight: bold; margin-right: 5px; }
 
-        /* قسم التحكم (الجزء السفلي) */
         #controls-area {
-            flex: 2; /* يأخذ 2/5 من الشاشة */
+            flex: 4;
             background: var(--secondary);
-            padding: 15px;
+            padding: 10px 15px 30px 15px; /* زيادة الحاشية السفلية للجوال */
             display: flex;
             flex-direction: column;
-            justify-content: space-evenly;
-            border-top: 4px solid var(--primary);
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.3);
+            justify-content: center;
+            gap: 10px;
+            border-top: 5px solid var(--primary);
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
             z-index: 10;
         }
 
         #question-box {
             background: white; color: var(--primary);
-            padding: 15px; border-radius: 15px;
-            text-align: center; font-size: 2rem; font-weight: 800;
-            box-shadow: inset 0 -3px 0 rgba(0,0,0,0.1);
-            min-height: 80px; display: flex; flex-direction: column; justify-content: center;
+            padding: 10px; border-radius: 15px;
+            text-align: center; font-size: 1.8rem; font-weight: 800;
+            box-shadow: inset 0 -4px 0 rgba(0,0,0,0.1);
+            min-height: 70px; display: flex; flex-direction: column; justify-content: center;
         }
-        .visual-representation { display: flex; justify-content: center; gap: 5px; margin-top: 5px; }
-        .dot { width: 12px; height: 12px; background: var(--accent-wrong); border-radius: 50%; display: inline-block; }
+        .visual-representation { display: flex; justify-content: center; gap: 4px; margin-top: 5px; flex-wrap: wrap; }
+        .dot { width: 10px; height: 10px; background: var(--accent-wrong); border-radius: 50%; display: inline-block; box-shadow: 1px 1px 0 rgba(0,0,0,0.2); }
 
         #options-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+            height: 80px; /* ارتفاع ثابت للأزرار */
         }
         .option-btn {
             background: white; color: var(--primary); border: none;
-            padding: 15px 5px; font-size: 1.8rem; font-weight: bold;
+            font-size: 1.6rem; font-weight: bold;
             border-radius: 12px; cursor: pointer;
             box-shadow: 0 4px 0 #bdc3c7; transition: transform 0.1s;
             font-family: 'Cairo', sans-serif;
+            height: 100%; /* ملء المساحة */
         }
         .option-btn:active { transform: translateY(4px); box-shadow: none; }
         
-        /* تأثيرات */
         .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake {
             10%, 90% { transform: translate3d(-2px, 0, 0); }
@@ -155,19 +164,18 @@
             40%, 60% { transform: translate3d(6px, 0, 0); }
         }
 
-        /* المتجر */
+        /* متجر */
         .shop-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0;
-            max-width: 500px; width: 100%;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0;
+            width: 100%; max-width: 400px;
         }
         .shop-item {
-            background: rgba(255,255,255,0.1); padding: 15px; border-radius: 15px;
-            border: 3px solid transparent; cursor: pointer; position: relative;
+            background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px;
+            border: 2px solid transparent; cursor: pointer; position: relative;
         }
         .shop-item.selected { border-color: var(--gold); background: rgba(241, 196, 15, 0.2); }
-        .shop-item.locked { opacity: 0.6; filter: grayscale(0.8); }
-        .shop-icon { font-size: 3rem; margin-bottom: 5px; }
-        .shop-price { font-weight: bold; color: var(--gold); }
+        .shop-item.locked { opacity: 0.5; filter: grayscale(1); }
+        .shop-icon { font-size: 2.5rem; }
         
     </style>
 </head>
@@ -184,28 +192,27 @@
             </div>
         </div>
 
-        <p style="margin-bottom: 15px; font-size: 1.1rem;">اختر المرحلة الدراسية:</p>
+        <p style="margin: 0 0 10px 0; color: #ecf0f1;">اختر المرحلة الدراسية:</p>
         <div class="mode-select">
             <button id="mode-lower" class="btn btn-blue mode-btn active" onclick="setMode('lower')">الصفوف الأولية</button>
             <button id="mode-upper" class="btn btn-blue mode-btn" onclick="setMode('upper')">الصفوف العليا</button>
         </div>
 
-        <button class="btn" onclick="startGame()">ابدأ التحدي!</button>
-        <button class="btn btn-gold" onclick="showShop()">المتجر والشخصيات 🛒</button>
+        <button class="btn" onclick="startGame()">ابدأ التحدي! 🎮</button>
+        <button class="btn btn-gold" onclick="showShop()">المتجر 🛒</button>
     </div>
 
     <div id="shop-screen" class="screen hidden">
-        <h1>متجر الأبطال</h1>
-        <p>رصيدك الحالي: <span class="arabic-num" id="shop-coins-disp" style="color:var(--gold); font-size: 1.5rem;">٠</span> 💰</p>
-        <div class="shop-grid" id="shop-items-container">
-            </div>
-        <button class="btn btn-blue" onclick="closeShop()">عودة للقائمة</button>
+        <h2 style="color:var(--gold)">اختر بطلك</h2>
+        <p>رصيدك: <span class="arabic-num" id="shop-coins-disp">٠</span> 💰</p>
+        <div class="shop-grid" id="shop-items-container"></div>
+        <button class="btn btn-blue" onclick="closeShop()">عودة</button>
     </div>
 
     <div id="game-over-screen" class="screen hidden">
-        <h1 style="color: var(--accent-wrong); font-size: 3rem;">سقطت القلعة!</h1>
-        <p style="font-size: 1.5rem;">النتيجة النهائية: <span class="arabic-num" id="final-score">٠</span></p>
-        <button class="btn" onclick="resetGame()">حاول مرة أخرى</button>
+        <h1 style="color: var(--accent-wrong);">انتهت المحاولة!</h1>
+        <p style="font-size: 1.5rem;">جمعت: <span class="arabic-num" id="final-score">٠</span> نقطة</p>
+        <button class="btn" onclick="resetGame()">لعب مرة أخرى</button>
         <button class="btn btn-blue" onclick="location.reload()">القائمة الرئيسية</button>
     </div>
 
@@ -215,13 +222,12 @@
             <div id="hud">
                 <div class="hud-item"><i class="fas fa-heart" style="color:#e74c3c"></i> <span class="arabic-num" id="lives-disp">٣</span></div>
                 <div class="hud-item"><i class="fas fa-star" style="color:var(--gold)"></i> <span class="arabic-num" id="score-disp">٠</span></div>
-                <div class="hud-item"><i class="fas fa-coins" style="color:gold"></i> <span class="arabic-num" id="coins-disp">٠</span></div>
             </div>
         </div>
 
         <div id="controls-area">
             <div id="question-box">
-                <div id="q-text">جاري التحميل...</div>
+                <div id="q-text">...</div>
                 <div id="q-visual"></div>
             </div>
             <div id="options-grid">
@@ -233,81 +239,104 @@
     </div>
 
     <script>
-        // --- تهيئة المتغيرات الأساسية ---
+        // --- إعداد ملف التثبيت (Manifest) ديناميكياً ---
+        const manifestData = {
+            "name": "حارس القلعة",
+            "short_name": "القلعة",
+            "start_url": ".",
+            "display": "standalone",
+            "background_color": "#2c3e50",
+            "theme_color": "#2c3e50",
+            "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/3069/3069172.png", "sizes": "192x192", "type": "image/png"}]
+        };
+        const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
+        document.getElementById('manifest-placeholder').href = URL.createObjectURL(blob);
+
+        // --- المتغيرات ---
         const canvas = document.getElementById('game-canvas');
         const ctx = canvas.getContext('2d');
         let gameMode = 'lower';
         let score = 0, lives = 3, coins = 0;
         let currentAnswer = 0;
-        let gameState = 'start'; // start, playing, gameover
+        let gameState = 'start';
         let difficulty = 1;
         
-        // بيانات اللاعب المحفوظة
-        let savedData = JSON.parse(localStorage.getItem('mathHeroData_v2')) || {
-            coins: 0,
-            boughtSkins: ['👮‍♂️'],
-            currentSkin: '👮‍♂️'
-        };
+        let savedData = JSON.parse(localStorage.getItem('mathHero_v3')) || { coins: 0, boughtSkins: ['👮‍♂️'], currentSkin: '👮‍♂️' };
         coins = savedData.coins;
 
-        // قائمة الأبطال في المتجر
         const shopItems = [
             { icon: '👮‍♂️', price: 0 }, { icon: '🦸‍♂️', price: 50 },
             { icon: '🥷', price: 100 }, { icon: '🦁', price: 200 },
-            { icon: '🤖', price: 350 }, { icon: '👑', price: 500 }
+            { icon: '🤖', price: 300 }, { icon: '🧙‍♂️', price: 500 }
         ];
 
-        // كائنات اللعبة
         let hero = { x: 50, y: 0, sprite: savedData.currentSkin };
         let enemies = [];
         let particles = [];
         let lastSpawnTime = 0;
         let spawnInterval = 2500;
+        let groundLevel = 0;
 
-        // --- دوال مساعدة (Helpers) ---
-        // دالة سحرية لتحويل الأرقام الإنجليزية إلى عربية مشرقية
+        // --- دوال مساعدة ---
         function toArabicNum(num) {
-            const map = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-            return num.toString().split('').map(d => map[d] || d).join('');
+            return num.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
         }
-        // تحويل الرقم العربي المدخل من الزر إلى رقم إنجليزي للمقارنة
+        
         function fromArabicNum(str) {
-             const map = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
-             return parseInt(str.split('').map(d => map[d] || d).join(''));
+             return parseInt(str.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)));
         }
 
         function resizeCanvas() {
             const container = document.getElementById('game-view');
             canvas.width = container.clientWidth;
             canvas.height = container.clientHeight;
-            // تحديث موقع البطل بناء على حجم الشاشة الجديد
-            hero.y = canvas.height * 0.75; // على خط الأرض
+            // تحديد مستوى الأرض بالنسبة لحجم الشاشة
+            groundLevel = canvas.height * 0.6; 
+            hero.y = groundLevel + 10;
         }
         window.addEventListener('resize', resizeCanvas);
 
-        // --- إدارة واجهة المستخدم ---
-        function updateHUD() {
-            document.querySelectorAll('.arabic-num').forEach(el => {
-                if(el.id === 'score-disp') el.innerText = toArabicNum(score);
-                if(el.id === 'lives-disp') el.innerText = toArabicNum(lives);
-                if(el.id === 'coins-disp' || el.id === 'shop-coins-disp') el.innerText = toArabicNum(coins);
-                if(el.id === 'final-score') el.innerText = toArabicNum(score);
-            });
-            saveProgress();
+        // --- رسم القلعة (أفضل من المستطيل) ---
+        function drawCastle() {
+            const w = canvas.width * 0.25; // عرض القلعة
+            const h = canvas.height * 0.4; // ارتفاعها
+            const x = 0;
+            const y = groundLevel - h + 20;
+
+            ctx.fillStyle = '#7f8c8d'; // لون الجدران
+            // البرج الأيسر
+            ctx.fillRect(x, y + 20, w * 0.3, h - 20);
+            // البرج الأيمن (الرئيسي)
+            ctx.fillRect(x + w * 0.3, y - 20, w * 0.4, h + 20);
+            
+            // الشرفات (Battlements)
+            ctx.fillStyle = '#95a5a6';
+            ctx.fillRect(x, y + 10, w * 0.1, 10);
+            ctx.fillRect(x + w * 0.2, y + 10, w * 0.1, 10);
+            ctx.fillRect(x + w * 0.3, y - 30, w * 0.12, 10);
+            ctx.fillRect(x + w * 0.58, y - 30, w * 0.12, 10);
+
+            // البوابة
+            ctx.fillStyle = '#5d4037'; // بني غامق
+            ctx.beginPath();
+            ctx.arc(x + w * 0.5, groundLevel + 20, w * 0.15, Math.PI, 0);
+            ctx.fill();
+            
+            // العلم
+            ctx.fillStyle = '#c0392b';
+            ctx.beginPath();
+            ctx.moveTo(x + w * 0.5, y - 60);
+            ctx.lineTo(x + w * 0.5, y - 30);
+            ctx.lineTo(x + w * 0.7, y - 45);
+            ctx.fill();
+            ctx.strokeStyle = '#2c3e50';
+            ctx.beginPath();
+            ctx.moveTo(x + w * 0.5, y - 30);
+            ctx.lineTo(x + w * 0.5, y - 20);
+            ctx.stroke();
         }
 
-        function setMode(mode) {
-            gameMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('mode-'+mode).classList.add('active');
-        }
-
-        function saveProgress() {
-            savedData.coins = coins;
-            localStorage.setItem('mathHeroData_v2', JSON.stringify(savedData));
-        }
-
-        // --- منطق اللعبة والأسئلة ---
+        // --- اللعبة ---
         function startGame() {
             gameState = 'playing';
             score = 0; lives = 3; difficulty = 1; spawnInterval = 2500;
@@ -320,206 +349,139 @@
             gameLoop();
         }
 
+        function updateHUD() {
+            document.querySelectorAll('.arabic-num').forEach(el => {
+                if(el.id.includes('score')) el.innerText = toArabicNum(score);
+                if(el.id.includes('lives')) el.innerText = toArabicNum(lives);
+                if(el.id.includes('coins')) el.innerText = toArabicNum(coins);
+            });
+            localStorage.setItem('mathHero_v3', JSON.stringify({ coins, boughtSkins: savedData.boughtSkins, currentSkin: savedData.currentSkin }));
+        }
+
         function generateNewQuestion() {
-            let n1, n2, op, opSymbol, visualHTML = '';
+            let n1, n2, op, vis = '';
             
             if (gameMode === 'lower') {
-                // صفوف أولية: جمع وطرح (0-10)
-                op = Math.random() > 0.5 ? '+' : '-';
-                opSymbol = op === '+' ? '+' : '−'; // علامة طرح واضحة
-                if (op === '+') {
-                    n1 = Math.floor(Math.random() * 11);
+                if (Math.random() > 0.5) { // جمع
+                    n1 = Math.floor(Math.random() * 6);
                     n2 = Math.floor(Math.random() * (11 - n1));
                     currentAnswer = n1 + n2;
-                    visualHTML = drawVisualDots(n1) + ' + ' + drawVisualDots(n2);
-                } else {
+                    document.getElementById('q-text').innerText = `${toArabicNum(n1)} + ${toArabicNum(n2)} = ؟`;
+                    vis = drawDots(n1) + '<span style="font-size:1.5rem">+</span>' + drawDots(n2);
+                } else { // طرح
                     n1 = Math.floor(Math.random() * 11);
                     n2 = Math.floor(Math.random() * (n1 + 1));
                     currentAnswer = n1 - n2;
-                    visualHTML = drawVisualDots(n1); // في الطرح نمثل العدد الأول فقط
+                    document.getElementById('q-text').innerText = `${toArabicNum(n1)} − ${toArabicNum(n2)} = ؟`;
+                    vis = drawDots(n1);
                 }
             } else {
-                // صفوف عليا: ضرب وقسمة
-                op = Math.random() > 0.5 ? '*' : '/';
-                opSymbol = op === '*' ? '×' : '÷';
-                if (op === '*') {
+                if (Math.random() > 0.5) { // ضرب
                     n1 = Math.floor(Math.random() * 11);
                     n2 = Math.floor(Math.random() * 11);
                     currentAnswer = n1 * n2;
-                } else {
-                    n2 = Math.floor(Math.random() * 9) + 1; // المقسوم عليه 1-9
-                    currentAnswer = Math.floor(Math.random() * 11); // الناتج 0-10
-                    n1 = n2 * currentAnswer; // المقسوم
+                    document.getElementById('q-text').innerText = `${toArabicNum(n1)} × ${toArabicNum(n2)} = ؟`;
+                } else { // قسمة
+                    n2 = Math.floor(Math.random() * 9) + 1;
+                    currentAnswer = Math.floor(Math.random() * 11);
+                    n1 = n2 * currentAnswer;
+                    document.getElementById('q-text').innerText = `${toArabicNum(n1)} ÷ ${toArabicNum(n2)} = ؟`;
                 }
             }
-
-            // عرض السؤال بالأرقام العربية
-            document.getElementById('q-text').innerText = `${toArabicNum(n1)} ${opSymbol} ${toArabicNum(n2)} = ؟`;
-            document.getElementById('q-visual').innerHTML = visualHTML;
+            document.getElementById('q-visual').innerHTML = vis;
             
-            generateOptions(currentAnswer);
-        }
-
-        function drawVisualDots(num) {
-            if(num === 0 || gameMode === 'upper') return '';
-            let dots = '';
-            for(let i=0; i<num; i++) dots += '<span class="dot"></span>';
-            return `<div class="visual-representation">${dots}</div>`;
-        }
-
-        function generateOptions(correctAnswer) {
-            let options = [correctAnswer];
-            // توليد خيارين خاطئين قريبين من الإجابة
-            while (options.length < 3) {
-                let offset = Math.floor(Math.random() * 5) + 1; // إزاحة بين 1 و 5
-                let sign = Math.random() > 0.5 ? 1 : -1;
-                let wrong = correctAnswer + (offset * sign);
-                
-                // التأكد أن الخيار الخاطئ منطقي (غير سالب، وليس مكرر)
-                if (wrong >= 0 && !options.includes(wrong)) {
-                    options.push(wrong);
-                }
+            // خيارات
+            let opts = [currentAnswer];
+            while(opts.length < 3) {
+                let r = currentAnswer + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random()*5)+1);
+                if(r >= 0 && !opts.includes(r)) opts.push(r);
             }
-            // خلط الخيارات
-            options.sort(() => Math.random() - 0.5);
+            opts.sort(() => Math.random() - 0.5);
             
-            // وضع الخيارات في الأزرار وتحويلها لعربي
             const btns = document.querySelectorAll('.option-btn');
-            btns.forEach((btn, index) => {
-                btn.innerText = toArabicNum(options[index]);
-                btn.disabled = false; // إعادة تفعيل الزر
-                btn.style.backgroundColor = 'white'; // إعادة اللون الأصلي
-                btn.style.color = 'var(--primary)';
+            btns.forEach((b, i) => {
+                b.innerText = toArabicNum(opts[i]);
+                b.disabled = false;
+                b.style.backgroundColor = 'white';
+                b.style.color = 'var(--primary)';
             });
         }
 
-        function checkAnswer(btnElement) {
-            const selectedAnswer = fromArabicNum(btnElement.innerText);
-            const optionsBtns = document.querySelectorAll('.option-btn');
-            optionsBtns.forEach(b => b.disabled = true); // تعطيل الأزرار مؤقتاً
+        function drawDots(n) {
+            if(gameMode === 'upper') return '';
+            let s = ''; for(let i=0;i<n;i++) s+='<span class="dot"></span>';
+            return `<div class="visual-representation">${s}</div>`;
+        }
 
-            if (selectedAnswer === currentAnswer) {
-                // إجابة صحيحة
-                btnElement.style.backgroundColor = 'var(--accent-correct)';
-                btnElement.style.color = 'white';
-                handleCorrect();
+        function checkAnswer(btn) {
+            let val = fromArabicNum(btn.innerText);
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.disabled = true);
+            
+            if(val === currentAnswer) {
+                btn.style.backgroundColor = '#2ecc71';
+                btn.style.color = 'white';
+                score += 10; coins += 2;
+                if(enemies.length) { createExplosion(enemies[0].x, enemies[0].y); enemies.shift(); }
+                updateHUD();
+                setTimeout(generateNewQuestion, 200);
             } else {
-                // إجابة خاطئة
-                btnElement.style.backgroundColor = 'var(--accent-wrong)';
-                btnElement.style.color = 'white';
+                btn.style.backgroundColor = '#e74c3c';
+                btn.style.color = 'white';
                 document.getElementById('controls-area').classList.add('shake');
                 setTimeout(() => {
-                     document.getElementById('controls-area').classList.remove('shake');
-                     optionsBtns.forEach(b => {
-                         b.disabled = false;
-                         b.style.backgroundColor = 'white';
-                         b.style.color = 'var(--primary)';
-                     });
-                }, 500);
+                    document.getElementById('controls-area').classList.remove('shake');
+                    allBtns.forEach(b => { b.disabled = false; b.style.backgroundColor = 'white'; b.style.color = 'var(--primary)'; });
+                }, 400);
             }
         }
 
-        function handleCorrect() {
-            score += 10;
-            coins += 2;
-            updateHUD();
+        function gameLoop(t) {
+            if(gameState !== 'playing') return;
+            ctx.clearRect(0,0,canvas.width,canvas.height);
             
-            // تدمير أقرب وحش
-            if(enemies.length > 0) {
-                createExplosion(enemies[0].x, enemies[0].y);
-                enemies.shift();
-            }
-
-            // زيادة الصعوبة كل 50 نقطة
-            if(score > 0 && score % 50 === 0) {
-                difficulty += 0.2;
-                spawnInterval = Math.max(1000, spawnInterval - 200);
-            }
-
-            setTimeout(generateNewQuestion, 300); // تأخير بسيط قبل السؤال التالي
-        }
-
-        // --- حلقة اللعب والرسوميات (Canvas Loop) ---
-        function gameLoop(timestamp) {
-            if (gameState !== 'playing') return;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // رسم الخلفية والأرض
-            drawEnvironment();
+            // رسم القلعة الجديدة
+            drawCastle();
 
             // رسم البطل
             ctx.font = `${canvas.height * 0.15}px Cairo`;
             ctx.textAlign = 'center';
-            ctx.fillText(hero.sprite, canvas.width * 0.15, hero.y);
+            ctx.fillText(hero.sprite, canvas.width * 0.15, groundLevel + 10);
 
-            // إضافة وحوش جديدة
-            if (timestamp - lastSpawnTime > spawnInterval) {
-                spawnEnemy();
-                lastSpawnTime = timestamp;
+            // إضافة وحوش
+            if(t - lastSpawnTime > spawnInterval) {
+                // موازنة السرعة: إذا الشاشة كبيرة (كمبيوتر) نقلل المعامل، إذا صغيرة (جوال) نرفعه شوي
+                // الأساس: سرعة ثابتة تقريباً بغض النظر عن عرض الشاشة
+                let baseSpeed = 1.5; 
+                let screenFactor = canvas.width > 800 ? 0.001 : 0.003; 
+                
+                enemies.push({
+                    x: canvas.width + 50,
+                    y: groundLevel + 10,
+                    speed: (canvas.width * screenFactor + baseSpeed) * difficulty,
+                    sprite: ['👾','👺','👹','🐉'][Math.floor(Math.random()*4)]
+                });
+                lastSpawnTime = t;
             }
 
-            // تحديث ورسم الوحوش
-            updateEnemies();
-
-            // تأثيرات الانفجار
-            updateParticles();
-
-            requestAnimationFrame(gameLoop);
-        }
-
-        function drawEnvironment() {
-            // خط الأرض يتم تحديده بناءً على نسبة من ارتفاع الشاشة
-            const groundLevel = canvas.height * 0.7; 
-            // رسم القلعة (بسيط)
-            ctx.fillStyle = '#95a5a6';
-            ctx.fillRect(0, groundLevel - canvas.height*0.2, canvas.width*0.25, canvas.height*0.3);
-             // رسم الباب
-            ctx.fillStyle = '#7f8c8d';
-            ctx.fillRect(canvas.width*0.05, groundLevel - canvas.height*0.1, canvas.width*0.15, canvas.height*0.1);
-        }
-
-        function spawnEnemy() {
-            const sprites = ['👾', '👹', '👺', '🐍', '🦂'];
-            enemies.push({
-                x: canvas.width + 50,
-                y: canvas.height * 0.75, // على خط الأرض
-                speed: (canvas.width * 0.002) * difficulty, // السرعة نسبية لعرض الشاشة
-                sprite: sprites[Math.floor(Math.random() * sprites.length)]
-            });
-        }
-
-        function updateEnemies() {
-            for (let i = enemies.length - 1; i >= 0; i--) {
+            // حركة الوحوش
+            for(let i=enemies.length-1; i>=0; i--) {
                 let e = enemies[i];
                 e.x -= e.speed;
-                
-                // رسم الوحش
-                ctx.font = `${canvas.height * 0.12}px Cairo`;
                 ctx.fillText(e.sprite, e.x, e.y);
-
-                // التحقق من الاصطدام بالقلعة
-                if (e.x < canvas.width * 0.2) {
-                    enemies.splice(i, 1);
-                    lives--;
-                    updateHUD();
+                if(e.x < canvas.width * 0.2) {
+                    enemies.splice(i,1); lives--; updateHUD();
                     document.getElementById('game-view').classList.add('shake');
                     setTimeout(()=>document.getElementById('game-view').classList.remove('shake'), 400);
-                    if(lives <= 0) gameOver();
+                    if(lives <= 0) {
+                        gameState = 'over';
+                        document.getElementById('game-container').classList.add('hidden');
+                        document.getElementById('game-over-screen').classList.remove('hidden');
+                    }
                 }
             }
-        }
 
-        function createExplosion(x, y) {
-            for(let i=0; i<20; i++) {
-                particles.push({
-                    x: x, y: y,
-                    vx: (Math.random()-0.5) * 10, vy: (Math.random()-0.5) * 10,
-                    life: 1, color: `hsl(${Math.random()*360}, 100%, 50%)`
-                });
-            }
-        }
-
-        function updateParticles() {
+            // انفجارات
             for(let i=particles.length-1; i>=0; i--) {
                 let p = particles[i];
                 p.x += p.vx; p.y += p.vy; p.life -= 0.05;
@@ -529,64 +491,34 @@
                 if(p.life<=0) particles.splice(i,1);
             }
             ctx.globalAlpha = 1;
+
+            requestAnimationFrame(gameLoop);
         }
 
-        function gameOver() {
-            gameState = 'gameover';
-            saveProgress();
-            document.getElementById('game-container').classList.add('hidden');
-            document.getElementById('game-over-screen').classList.remove('hidden');
-            updateHUD();
-        }
-
-        function resetGame() {
-            document.getElementById('game-over-screen').classList.add('hidden');
-            startGame();
-        }
-
-        // --- نظام المتجر ---
-        function showShop() {
-            document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('shop-screen').classList.remove('hidden');
-            updateHUD();
-            renderShopItems();
-        }
-        function closeShop() {
-            document.getElementById('shop-screen').classList.add('hidden');
-            document.getElementById('start-screen').classList.remove('hidden');
-        }
-        function renderShopItems() {
-            const container = document.getElementById('shop-items-container');
-            container.innerHTML = '';
+        // المتجر
+        function renderShop() {
+            const c = document.getElementById('shop-items-container'); c.innerHTML = '';
             shopItems.forEach(item => {
-                const isBought = savedData.boughtSkins.includes(item.icon);
-                const isSelected = savedData.currentSkin === item.icon;
-                
+                let owned = savedData.boughtSkins.includes(item.icon);
                 let div = document.createElement('div');
-                div.className = `shop-item ${isSelected ? 'selected' : ''} ${!isBought ? 'locked' : ''}`;
-                div.innerHTML = `
-                    <div class="shop-icon">${item.icon}</div>
-                    <div class="shop-price arabic-num">${isBought ? (isSelected ? 'مستخدم' : 'مملوك') : toArabicNum(item.price) + ' 💰'}</div>
-                `;
-                
+                div.className = `shop-item ${savedData.currentSkin === item.icon ? 'selected' : ''} ${!owned ? 'locked' : ''}`;
+                div.innerHTML = `<div class="shop-icon">${item.icon}</div><div>${owned ? '✔' : toArabicNum(item.price)}</div>`;
                 div.onclick = () => {
-                    if (isBought) {
-                        savedData.currentSkin = item.icon;
-                        hero.sprite = item.icon;
-                        saveProgress(); renderShopItems();
-                    } else if (coins >= item.price) {
-                        coins -= item.price;
-                        savedData.boughtSkins.push(item.icon);
-                        savedData.currentSkin = item.icon;
-                        hero.sprite = item.icon;
-                        saveProgress(); renderShopItems(); updateHUD();
+                    if(owned) { savedData.currentSkin = item.icon; hero.sprite = item.icon; renderShop(); updateHUD(); }
+                    else if(coins >= item.price) {
+                        coins -= item.price; savedData.boughtSkins.push(item.icon);
+                        savedData.currentSkin = item.icon; hero.sprite = item.icon;
+                        renderShop(); updateHUD();
                     }
-                };
-                container.appendChild(div);
+                }
+                c.appendChild(div);
             });
         }
+        function showShop() { document.getElementById('start-screen').classList.add('hidden'); document.getElementById('shop-screen').classList.remove('hidden'); renderShop(); }
+        function closeShop() { document.getElementById('shop-screen').classList.add('hidden'); document.getElementById('start-screen').classList.remove('hidden'); }
+        function setMode(m) { gameMode = m; document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active')); document.getElementById('mode-'+m).classList.add('active'); }
+        function resetGame() { document.getElementById('game-over-screen').classList.add('hidden'); startGame(); }
 
-        // تهيئة أولية لمرة واحدة
         resizeCanvas();
     </script>
 </body>
