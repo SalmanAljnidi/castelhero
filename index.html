@@ -159,7 +159,7 @@
             <button id="mode-lower" class="mode-btn active" onclick="setMode('lower')">الصفوف الأولية</button>
             <button id="mode-upper" class="mode-btn" onclick="setMode('upper')">الصفوف العليا</button>
         </div>
-        <button class="btn" onclick="initAudioAndStart()">ابدأ المعركة! ⚔️</button>
+        <button class="btn" onclick="initAudioAndStart()">ابدأ التحدي! ⚔️</button>
         <button class="btn btn-gold" onclick="showShop()">المتجر 🛒</button>
     </div>
 
@@ -201,7 +201,6 @@
     </div>
 
     <script>
-        // إعداد التثبيت
         const manifestData = {
             "name": "حارس القلعة", "short_name": "القلعة", "start_url": ".",
             "display": "standalone", "background_color": "#2c3e50", "theme_color": "#2c3e50",
@@ -211,7 +210,6 @@
         const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
         document.getElementById('manifest-placeholder').href = URL.createObjectURL(blob);
 
-        // الصوت
         let audioCtx;
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -229,12 +227,9 @@
                 osc.type = 'sine'; osc.frequency.setValueAtTime(500, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.1); gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
             } else if (type === 'wrong') { 
                 osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime); osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.2); gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-            } else if (type === 'charge') {
-                 // صوت تكتكة خفيف (اختياري)
             }
         }
 
-        // المتغيرات
         const canvas = document.getElementById('game-canvas');
         const ctx = canvas.getContext('2d');
         let gameMode = 'lower';
@@ -243,7 +238,7 @@
         let gameState = 'start';
         let difficulty = 1;
         
-        let savedData = JSON.parse(localStorage.getItem('mathHero_v7')) || { coins: 0, boughtSkins: ['👮‍♂️'], currentSkin: '👮‍♂️' };
+        let savedData = JSON.parse(localStorage.getItem('mathHero_v8')) || { coins: 0, boughtSkins: ['👮‍♂️'], currentSkin: '👮‍♂️' };
         coins = savedData.coins;
 
         const shopItems = [
@@ -256,10 +251,8 @@
         let enemies = [];
         let particles = [];
         let clouds = [];
-        let lastSpawnTime = 0;
-        let spawnInterval = 3000;
         let groundLevel = 0;
-        let castleX = 0; // موقع القلعة
+        let castleX = 0;
 
         function toArabicNum(num) {
             return num.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
@@ -272,13 +265,12 @@
                 canvas.height = container.clientHeight;
                 groundLevel = canvas.height * 0.75;
                 hero.y = groundLevel + 5;
-                castleX = canvas.width * 0.25; // القلعة تأخذ ربع الشاشة اليسار
+                castleX = canvas.width * 0.25;
                 enemies.forEach(e => e.y = groundLevel + 5);
             }
         }
         window.addEventListener('resize', resizeCanvas);
 
-        // --- البيئة ---
         function initClouds() {
             clouds = [];
             for(let i=0; i<5; i++) {
@@ -309,9 +301,8 @@
             ctx.fillStyle = '#27ae60'; ctx.fillRect(0, groundLevel, canvas.width, canvas.height - groundLevel);
             ctx.fillStyle = '#2ecc71'; ctx.fillRect(0, groundLevel, canvas.width, 10);
             
-            // رسم خط الدفاع (الجدار)
             ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 4; ctx.setLineDash([10, 5]);
-            ctx.beginPath(); ctx.moveTo(castleX + 20, groundLevel); ctx.lineTo(castleX + 20, groundLevel - 150); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(castleX + 30, groundLevel); ctx.lineTo(castleX + 30, groundLevel - 150); ctx.stroke();
             ctx.setLineDash([]);
 
             drawCastle();
@@ -339,14 +330,13 @@
             ctx.beginPath(); ctx.moveTo(x + w/2, flagY - 40); ctx.lineTo(x + w + 20, flagY - 30); ctx.lineTo(x + w/2, flagY - 20); ctx.fill();
         }
 
-        // --- منطق اللعبة ---
         function initAudioAndStart() {
             initAudio(); startGame();
         }
 
         function startGame() {
             gameState = 'playing';
-            score = 0; lives = 3; difficulty = 1; spawnInterval = 3000;
+            score = 0; lives = 3; difficulty = 1;
             enemies = []; particles = [];
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('game-container').classList.remove('hidden');
@@ -359,7 +349,7 @@
                 if(el.id.includes('lives')) el.innerText = toArabicNum(lives);
                 if(el.id.includes('coins')) el.innerText = toArabicNum(coins);
             });
-            localStorage.setItem('mathHero_v7', JSON.stringify({ coins, boughtSkins: savedData.boughtSkins, currentSkin: savedData.currentSkin }));
+            localStorage.setItem('mathHero_v8', JSON.stringify({ coins, boughtSkins: savedData.boughtSkins, currentSkin: savedData.currentSkin }));
         }
 
         function generateNewQuestion() {
@@ -426,7 +416,7 @@
                     setTimeout(() => {
                         if(enemies.length > 0) { 
                             createExplosion(enemies[0].x, enemies[0].y); 
-                            enemies.shift(); // إزالة أول وحش فقط
+                            enemies.shift(); 
                             playSound('explosion'); 
                         }
                     }, 200);
@@ -459,66 +449,61 @@
             ctx.textAlign = 'center'; ctx.fillText(hero.sprite, canvas.width * 0.15, groundLevel + 5);
             ctx.shadowBlur = 0;
 
-            if(t - lastSpawnTime > spawnInterval) {
-                let baseSpeed = 2; // سرعة المشي عادية
-                enemies.push({
-                    x: canvas.width + 50, y: groundLevel + 5,
-                    speed: baseSpeed * difficulty,
-                    sprite: ['👾','👺','👹','🐉','🦖'][Math.floor(Math.random()*5)],
-                    walkOffset: 0,
-                    state: 'walking', // walking or attacking
-                    attackTimer: 0,
-                    maxAttackTime: 500 // كل ما زاد الرقم زاد وقت التفكير (حوالي 8 ثواني)
-                });
-                lastSpawnTime = t;
+            // نظام المبارزة: وحش واحد أو اثنين كحد أقصى
+            if(enemies.length < 2) {
+                // إضافة وحش جديد فقط إذا كان العدد قليل
+                // يتم إضافة مسافة كبيرة بين الوحش الحالي والجديد
+                let lastX = enemies.length > 0 ? enemies[enemies.length-1].x : canvas.width;
+                if (lastX < canvas.width - 150) { // مسافة أمان
+                    let baseSpeed = 1.5; 
+                    enemies.push({
+                        x: canvas.width + 50, y: groundLevel + 5,
+                        speed: baseSpeed * difficulty,
+                        sprite: ['👾','👺','👹','🐉','🦖'][Math.floor(Math.random()*5)],
+                        walkOffset: 0,
+                        attackTimer: 0,
+                        maxAttackTime: 800 // حوالي 13 ثانية - وقت طويل للتفكير
+                    });
+                }
             }
 
-            // حدود الوقوف (طابور)
-            // كل وحش يوقف خلف اللي قبله بمسافة
-            
             for(let i=0; i<enemies.length; i++) {
                 let e = enemies[i];
-                let targetX = castleX + 40 + (i * 50); // ترتيب الطابور
+                // نقطة التوقف: الوحش الأول يقف عند الخط، الثاني يقف خلفه
+                let stopPoint = castleX + 40 + (i * 60);
 
-                if (e.x > targetX) {
-                    e.state = 'walking';
+                if (e.x > stopPoint) {
+                    // مرحلة المشي
                     e.x -= e.speed;
-                    e.walkOffset += 0.2;
+                    e.walkOffset += 0.15;
                     let bounce = Math.sin(e.walkOffset) * 5;
                     ctx.font = `${canvas.height * 0.12}px Cairo`;
                     ctx.fillText(e.sprite, e.x, e.y + bounce);
                 } else {
-                    // وصل لنقطة الوقوف
-                    e.state = 'attacking';
-                    e.x = targetX; // تثبيت الموقع
-                    
-                    // رسم الوحش واقف
+                    // مرحلة الوقوف والهجوم
+                    e.x = stopPoint;
                     ctx.font = `${canvas.height * 0.12}px Cairo`;
                     ctx.fillText(e.sprite, e.x, e.y);
 
-                    // إذا كان هو الأول في الطابور، يبدأ العداد
+                    // فقط الوحش الأول هو من يهاجم (المبارزة)
                     if (i === 0) {
                         e.attackTimer++;
-                        // رسم دائرة العداد
-                        let progress = e.attackTimer / e.maxAttackTime;
-                        ctx.strokeStyle = `rgb(${255 * progress}, ${255 * (1-progress)}, 0)`;
-                        ctx.lineWidth = 5;
-                        ctx.beginPath();
-                        ctx.arc(e.x, e.y - 70, 15, -Math.PI/2, (-Math.PI/2) + (Math.PI * 2 * progress));
-                        ctx.stroke();
+                        // رسم شريط الوقت فوق رأسه
+                        let barWidth = 60;
+                        let percent = e.attackTimer / e.maxAttackTime;
+                        ctx.fillStyle = "#555";
+                        ctx.fillRect(e.x - barWidth/2, e.y - 70, barWidth, 8);
+                        ctx.fillStyle = percent > 0.7 ? "#e74c3c" : "#2ecc71"; // أخضر ثم يتحول لأحمر
+                        ctx.fillRect(e.x - barWidth/2, e.y - 70, barWidth * (1-percent), 8);
 
                         if (e.attackTimer >= e.maxAttackTime) {
-                            // هجوم!
+                            // انتهى الوقت - هجوم!
                             lives--; updateHUD(); playSound('wrong');
                             document.getElementById('game-view').classList.add('shake');
                             setTimeout(()=>document.getElementById('game-view').classList.remove('shake'), 400);
-                            
-                            // إزالة الوحش (لأنه هجم خلاص) أو إرجاعه للخلف؟
-                            // الأفضل إزالته كعقاب
                             createExplosion(e.x, e.y);
-                            enemies.shift(); 
-                            i--; // تصحيح العداد
-
+                            enemies.shift(); // يموت بعد الهجوم
+                            i--; 
                             if(lives <= 0) {
                                 gameState = 'over';
                                 document.getElementById('game-container').classList.add('hidden');
@@ -526,9 +511,9 @@
                             }
                         }
                     } else {
-                        // الوحوش اللي في الخلف تنتظر (علامة Zzz)
-                        ctx.font = "15px Arial"; ctx.fillStyle = "#fff";
-                        ctx.fillText("...", e.x, e.y - 60);
+                        // الوحش الثاني ينتظر بصمت
+                         ctx.font = "20px Arial"; ctx.fillStyle = "#fff";
+                         ctx.fillText("⏳", e.x, e.y - 60);
                     }
                 }
             }
