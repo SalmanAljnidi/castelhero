@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>حارس القلعة الحسابية | سلمان الجنيدي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #e74c3c;
+            --gold: #f1c40f;
+            --bg: #ecf0f1;
+            --game-bg: #87CEEB; /* لون السماء */
+            --ground: #2ecc71;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--primary);
+            overflow: hidden;
+            touch-action: none;
+            user-select: none;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(to bottom, #87CEEB, #E0F7FA);
+            overflow: hidden;
+        }
+
+        /* واجهة اللعب */
+        #hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            color: #fff;
+            text-shadow: 2px 2px 0 #000;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* السؤال */
+        #question-box {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 30px;
+            border-radius: 20px;
+            border: 4px solid var(--primary);
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            box-shadow: 0 10px 0 rgba(0,0,0,0.2);
+            z-index: 5;
+            text-align: center;
+            min-width: 250px;
+        }
+
+        /* التمثيل البصري (للاولي) */
+        .visual-dots {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        .dot {
+            width: 15px;
+            height: 15px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: inset -2px -2px rgba(0,0,0,0.2);
+        }
+
+        /* لوحة المفاتيح */
+        #keypad {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            background: rgba(44, 62, 80, 0.9);
+            padding: 15px;
+            border-radius: 20px;
+            z-index: 20;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+        }
+
+        .key {
+            width: 60px;
+            height: 60px;
+            background: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            box-shadow: 0 4px 0 #bdc3c7;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .key:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .key.action {
+            background: var(--gold);
+            color: #fff;
+            box-shadow: 0 4px 0 #d4ac0d;
+        }
+        
+        .key.delete {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 0 #c0392b;
+        }
+
+        /* القلعة والوحوش واللاعب */
+        #canvas-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* شاشات القوائم */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(44, 62, 80, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            color: white;
+            text-align: center;
+        }
+
+        .hidden { display: none !important; }
+
+        h1 { font-size: 3rem; margin-bottom: 10px; color: var(--gold); text-shadow: 3px 3px 0 #000; }
+        
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            border-radius: 50px;
+            margin: 10px;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            box-shadow: 0 6px 0 #c0392b;
+            transition: transform 0.1s;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        .btn:active { transform: translateY(6px); box-shadow: none; }
+        .btn-green { background: #2ecc71; box-shadow: 0 6px 0 #27ae60; }
+        .btn-blue { background: #3498db; box-shadow: 0 6px 0 #2980b9; }
+
+        /* الفوتر الحقوق */
+        .footer-rights {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .social-icons {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .social-icons a {
+            color: white;
+            font-size: 1.5rem;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+        .social-icons a:hover { transform: scale(1.2); }
+
+        /* متجر */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .shop-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+        .shop-item.selected { border-color: var(--gold); background: rgba(241, 196, 15, 0.2); }
+        .shop-item.locked { opacity: 0.5; filter: grayscale(1); }
+
+    </style>
+</head>
+<body>
+
+    <div id="start-screen" class="screen">
+        <h1>حارس القلعة</h1>
+        <p style="font-size: 1.2rem; margin-bottom: 20px;">دافع عن القلعة بحل المسائل!</p>
+        
+        <div style="margin-bottom: 20px;">
+            <label style="font-size: 1.1rem; color: #ecf0f1;">اختر المرحلة:</label><br>
+            <button id="mode-lower" class="btn btn-blue" onclick="setMode('lower')" style="width: 40%; min-width: 140px; padding: 10px;">صفوف أولية</button>
+            <button id="mode-upper" class="btn btn-blue" onclick="setMode('upper')" style="width: 40%; min-width: 140px; padding: 10px; opacity: 0.6;">صفوف عليا</button>
+        </div>
+
+        <button class="btn btn-green" onclick="startGame()">ابدأ اللعب</button>
+        <button class="btn" onclick="showShop()">المتجر وشخصيتي</button>
+
+        <div class="footer-rights">
+            <p>جميع الحقوق محفوظة لـ سلمان الجنيدي</p>
+            <div class="social-icons">
+                <a href="https://wa.me/966566996166" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://snapchat.com/t/2tVDWcXq" target="_blank"><i class="fab fa-snapchat"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div id="shop-screen" class="screen hidden">
+        <h2>اختر بطلك</h2>
+        <p>رصيدك: <span id="shop-coins" style="color:var(--gold)">0</span> 💰</p>
+        <div class="shop-grid" id="shop-items">
+            </div>
+        <button class="btn" onclick="closeShop()">عودة</button>
+    </div>
+
+    <div id="game-over-screen" class="screen hidden">
+        <h1 style="color: var(--accent)">انتهت اللعبة!</h1>
+        <p style="font-size: 1.5rem">النتيجة: <span id="final-score">0</span></p>
+        <button class="btn btn-green" onclick="resetGame()">لعب مرة أخرى</button>
+        <button class="btn" onclick="location.reload()">القائمة الرئيسية</button>
+    </div>
+
+    <div id="game-container" class="hidden">
+        <canvas id="canvas-layer"></canvas>
+        
+        <div id="hud">
+            <div><i class="fas fa-heart" style="color:var(--accent)"></i> <span id="lives">3</span></div>
+            <div><i class="fas fa-star" style="color:var(--gold)"></i> <span id="score">0</span></div>
+            <div><i class="fas fa-coins" style="color:gold"></i> <span id="coins">0</span></div>
+        </div>
+
+        <div id="question-box">
+            <div id="q-text">Loading...</div>
+            <div id="q-visual" class="visual-dots"></div>
+        </div>
+
+        <div id="keypad">
+            <button class="key" onclick="inputDigit(1)">1</button>
+            <button class="key" onclick="inputDigit(2)">2</button>
+            <button class="key" onclick="inputDigit(3)">3</button>
+            <button class="key" onclick="inputDigit(4)">4</button>
+            <button class="key" onclick="inputDigit(5)">5</button>
+            <button class="key" onclick="inputDigit(6)">6</button>
+            <button class="key" onclick="inputDigit(7)">7</button>
+            <button class="key" onclick="inputDigit(8)">8</button>
+            <button class="key" onclick="inputDigit(9)">9</button>
+            <button class="key delete" onclick="deleteDigit()"><i class="fas fa-backspace"></i></button>
+            <button class="key" onclick="inputDigit(0)">0</button>
+            <button class="key action" onclick="checkAnswer()"><i class="fas fa-check"></i></button>
+        </div>
+    </div>
+
+    <script>
+        // --- إعدادات اللعبة ---
+        const canvas = document.getElementById('canvas-layer');
+        const ctx = canvas.getContext('2d');
+        let gameMode = 'lower'; // lower or upper
+        let score = 0;
+        let lives = 3;
+        let coins = parseInt(localStorage.getItem('mathHeroCoins')) || 0;
+        let selectedHero = localStorage.getItem('mathHeroSkin') || '👮‍♂️';
+        let gameLoop;
+        let currentAnswer = 0;
+        let inputBuffer = "";
+        let enemies = [];
+        let particles = [];
+        let spawnRate = 2000;
+        let lastSpawn = 0;
+        let difficultyMultiplier = 1;
+        let isGameOver = false;
+
+        // الأبطال المتاحين (الشراء)
+        const heroes = [
+            { id: 'h1', icon: '👮‍♂️', price: 0 },
+            { id: 'h2', icon: '🦸‍♂️', price: 50 },
+            { id: 'h3', icon: '🤖', price: 100 },
+            { id: 'h4', icon: '🦁', price: 200 },
+            { id: 'h5', icon: '👽', price: 500 },
+            { id: 'h6', icon: '👑', price: 1000 }
+        ];
+
+        // ضبط حجم الكانفاس
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // --- إدارة القوائم ---
+        function setMode(mode) {
+            gameMode = mode;
+            document.getElementById('mode-lower').style.opacity = mode === 'lower' ? '1' : '0.6';
+            document.getElementById('mode-upper').style.opacity = mode === 'upper' ? '1' : '0.6';
+            document.getElementById('mode-lower').style.border = mode === 'lower' ? '3px solid gold' : 'none';
+            document.getElementById('mode-upper').style.border = mode === 'upper' ? '3px solid gold' : 'none';
+        }
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-container').classList.remove('hidden');
+            resetGameState();
+            generateQuestion();
+            loop();
+        }
+
+        function resetGameState() {
+            score = 0;
+            lives = 3;
+            enemies = [];
+            particles = [];
+            inputBuffer = "";
+            difficultyMultiplier = 1;
+            spawnRate = 2500;
+            isGameOver = false;
+            updateUI();
+        }
+
+        function showShop() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('shop-screen').classList.remove('hidden');
+            renderShop();
+        }
+
+        function closeShop() {
+            document.getElementById('shop-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+        }
+
+        // --- منطق الأسئلة ---
+        function generateQuestion() {
+            let n1, n2, op, visualHTML = '';
+            
+            if (gameMode === 'lower') {
+                // صفوف أولية: جمع وطرح 0-10 مع تمثيل
+                op = Math.random() > 0.5 ? '+' : '-';
+                if (op === '+') {
+                    n1 = Math.floor(Math.random() * 6); // 0-5
+                    n2 = Math.floor(Math.random() * (11 - n1)); // ensures sum <= 10
+                    currentAnswer = n1 + n2;
+                    // تمثيل بصري
+                    visualHTML = `<div style="margin-right:10px">${drawDots(n1)}</div> <div>+</div> <div style="margin-left:10px">${drawDots(n2)}</div>`;
+                } else {
+                    n1 = Math.floor(Math.random() * 11); // 0-10
+                    n2 = Math.floor(Math.random() * (n1 + 1)); // ensures positive result
+                    currentAnswer = n1 - n2;
+                    // في الطرح نظهر الكل ونشطب (بصرياً نعرض الرقم الأول فقط)
+                     visualHTML = `<div>${drawDots(n1)}</div>`;
+                }
+            } else {
+                // صفوف عليا: ضرب وقسمة
+                op = Math.random() > 0.5 ? '×' : '÷';
+                if (op === '×') {
+                    n1 = Math.floor(Math.random() * 11); // 0-10
+                    n2 = Math.floor(Math.random() * 11);
+                    currentAnswer = n1 * n2;
+                } else {
+                    let divisor = Math.floor(Math.random() * 9) + 1; // 1-9 (avoid /0)
+                    let quotient = Math.floor(Math.random() * 10); // 0-9
+                    n1 = divisor * quotient; // Dividend
+                    n2 = divisor;
+                    currentAnswer = quotient;
+                }
+            }
+
+            document.getElementById('q-text').innerText = `${n1} ${op} ${n2} = ?`;
+            document.getElementById('q-text').innerText += ` ${inputBuffer}`; // Show current input
+            
+            if(gameMode === 'lower') {
+                document.getElementById('q-visual').innerHTML = visualHTML;
+                document.getElementById('q-visual').style.display = 'flex';
+            } else {
+                document.getElementById('q-visual').style.display = 'none';
+            }
+        }
+
+        function drawDots(num) {
+            let html = '';
+            for(let i=0; i<num; i++) {
+                html += '<span class="dot"></span>';
+            }
+            if(num === 0) html = '<span style="font-size:0.8rem; color:#777">فارغ</span>';
+            return `<div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:2px">${html}</div>`;
+        }
+
+        // --- نظام المدخلات ---
+        function inputDigit(d) {
+            if (inputBuffer.length < 3) {
+                inputBuffer += d;
+                updateQuestionDisplay();
+            }
+        }
+
+        function deleteDigit() {
+            inputBuffer = inputBuffer.slice(0, -1);
+            updateQuestionDisplay();
+        }
+
+        function updateQuestionDisplay() {
+            // تحديث النص الموجود فقط بدون تغيير المسألة
+            let text = document.getElementById('q-text').innerText.split('=')[0];
+            document.getElementById('q-text').innerText = `${text}= ${inputBuffer}`;
+        }
+
+        function checkAnswer() {
+            if (inputBuffer === "") return;
+            
+            if (parseInt(inputBuffer) === currentAnswer) {
+                // إجابة صحيحة
+                handleCorrectAnswer();
+            } else {
+                // إجابة خاطئة
+                shakeScreen();
+                inputBuffer = "";
+                updateQuestionDisplay();
+            }
+        }
+
+        // --- منطق اللعبة ---
+        class Enemy {
+            constructor() {
+                this.x = canvas.width + 50;
+                this.y = canvas.height - 180; // Ground levelish
+                this.speed = (Math.random() * 1 + 1) * difficultyMultiplier;
+                this.size = 60;
+                this.sprite = ['👾', '👹', '👺', '👻', '💀'][Math.floor(Math.random() * 5)];
+                this.walkOffset = 0;
+            }
+            update() {
+                this.x -= this.speed;
+                this.walkOffset += 0.2;
+            }
+            draw() {
+                ctx.font = `${this.size}px Arial`;
+                ctx.textAlign = "center";
+                let bounce = Math.sin(this.walkOffset) * 10;
+                ctx.fillText(this.sprite, this.x, this.y + bounce);
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 10;
+                this.vy = (Math.random() - 0.5) * 10;
+                this.life = 1.0;
+                this.color = color;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= 0.05;
+            }
+            draw() {
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 5, 0, Math.PI*2);
+                ctx.fill();
+                ctx.globalAlpha = 1.0;
+            }
+        }
+
+        function handleCorrectAnswer() {
+            // تدمير أقرب وحش
+            if (enemies.length > 0) {
+                let target = enemies[0]; // First one
+                createExplosion(target.x, target.y);
+                enemies.shift(); // Remove from array
+            }
+            
+            score += 10;
+            coins += 1;
+            inputBuffer = "";
+            
+            // زيادة الصعوبة
+            if (score % 50 === 0) {
+                difficultyMultiplier += 0.2;
+                spawnRate = Math.max(800, spawnRate - 200);
+            }
+
+            saveData();
+            updateUI();
+            generateQuestion();
+        }
+
+        function createExplosion(x, y) {
+            for(let i=0; i<15; i++) {
+                particles.push(new Particle(x, y, ['#e74c3c', '#f1c40f', '#ecf0f1'][Math.floor(Math.random()*3)]));
+            }
+        }
+
+        function shakeScreen() {
+            let container = document.getElementById('game-container');
+            container.style.transform = "translate(10px, 0)";
+            setTimeout(() => container.style.transform = "translate(-10px, 0)", 50);
+            setTimeout(() => container.style.transform = "translate(10px, 0)", 100);
+            setTimeout(() => container.style.transform = "translate(0, 0)", 150);
+        }
+
+        function loop(timestamp) {
+            if (isGameOver) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // رسم الخلفية (القلعة)
+            drawScene();
+
+            // Spawn enemies
+            if (timestamp - lastSpawn > spawnRate) {
+                enemies.push(new Enemy());
+                lastSpawn = timestamp;
+            }
+
+            // Update & Draw Enemies
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                let e = enemies[i];
+                e.update();
+                e.draw();
+
+                // Check collision with castle (Player)
+                if (e.x < 100) {
+                    enemies.splice(i, 1);
+                    lives--;
+                    shakeScreen();
+                    updateUI();
+                    if (lives <= 0) gameOver();
+                }
+            }
+
+            // Particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.update();
+                p.draw();
+                if (p.life <= 0) particles.splice(i, 1);
+            }
+
+            // Draw Hero
+            ctx.font = "80px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(selectedHero, 80, canvas.height - 180);
+
+            requestAnimationFrame(loop);
+        }
+
+        function drawScene() {
+            // Ground
+            ctx.fillStyle = "#2ecc71";
+            ctx.fillRect(0, canvas.height - 150, canvas.width, 150);
+            
+            // Castle Wall
+            ctx.fillStyle = "#95a5a6";
+            ctx.fillRect(0, canvas.height - 350, 120, 200);
+            ctx.fillStyle = "#7f8c8d";
+            ctx.fillRect(10, canvas.height - 350, 20, 20);
+            ctx.fillRect(50, canvas.height - 350, 20, 20);
+            ctx.fillRect(90, canvas.height - 350, 20, 20);
+        }
+
+        function updateUI() {
+            document.getElementById('score').innerText = score;
+            document.getElementById('lives').innerText = lives;
+            document.getElementById('coins').innerText = coins;
+            document.getElementById('shop-coins').innerText = coins;
+        }
+
+        function saveData() {
+            localStorage.setItem('mathHeroCoins', coins);
+            localStorage.setItem('mathHeroSkin', selectedHero);
+        }
+
+        function gameOver() {
+            isGameOver = true;
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('game-container').classList.add('hidden');
+            document.getElementById('game-over-screen').classList.remove('hidden');
+        }
+
+        function resetGame() {
+            document.getElementById('game-over-screen').classList.add('hidden');
+            document.getElementById('game-container').classList.remove('hidden');
+            resetGameState();
+            generateQuestion();
+            loop();
+        }
+
+        // --- المتجر ---
+        function renderShop() {
+            const grid = document.getElementById('shop-items');
+            grid.innerHTML = '';
+            let purchased = JSON.parse(localStorage.getItem('mathHeroPurchased')) || ['h1'];
+
+            heroes.forEach(h => {
+                let isOwned = purchased.includes(h.id);
+                let isSelected = selectedHero === h.icon;
+                
+                let div = document.createElement('div');
+                div.className = `shop-item ${isSelected ? 'selected' : ''} ${!isOwned ? 'locked' : ''}`;
+                div.innerHTML = `
+                    <div style="font-size:3rem">${h.icon}</div>
+                    <div>${isOwned ? 'مملوك' : h.price + ' 💰'}</div>
+                `;
+                
+                div.onclick = () => {
+                    if (isOwned) {
+                        selectedHero = h.icon;
+                        saveData();
+                        renderShop();
+                    } else {
+                        if (coins >= h.price) {
+                            coins -= h.price;
+                            purchased.push(h.id);
+                            localStorage.setItem('mathHeroPurchased', JSON.stringify(purchased));
+                            selectedHero = h.icon;
+                            saveData();
+                            renderShop();
+                            updateUI();
+                        } else {
+                            alert("ليس لديك ذهب كافٍ!");
+                        }
+                    }
+                };
+                grid.appendChild(div);
+            });
+        }
+        
+        // دعم لوحة المفاتيح الحقيقية
+        window.addEventListener('keydown', (e) => {
+            if(e.key >= '0' && e.key <= '9') inputDigit(e.key);
+            if(e.key === 'Backspace') deleteDigit();
+            if(e.key === 'Enter') checkAnswer();
+        });
+
+    </script>
+</body>
+</html>
