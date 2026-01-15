@@ -114,7 +114,26 @@
             min-height: 80px; display: flex; flex-direction: column; justify-content: center;
         }
         .visual-representation { display: flex; justify-content: center; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
-        .dot { width: 14px; height: 14px; background: var(--accent-wrong); border-radius: 50%; display: inline-block; box-shadow: inset -2px -2px rgba(0,0,0,0.2); border: 1px solid rgba(0,0,0,0.1); }
+        
+        .dot { 
+            width: 16px; height: 16px; 
+            background: var(--accent-wrong); 
+            border-radius: 50%; display: inline-block; 
+            box-shadow: inset -2px -2px rgba(0,0,0,0.2); 
+            border: 1px solid rgba(0,0,0,0.1); 
+            position: relative;
+        }
+        
+        .dot.crossed {
+            background: #bdc3c7;
+            opacity: 0.6;
+        }
+        .dot.crossed::after {
+            content: ''; position: absolute; top: 50%; left: 50%; width: 100%; height: 3px; background: #c0392b; transform: translate(-50%, -50%) rotate(45deg);
+        }
+        .dot.crossed::before {
+            content: ''; position: absolute; top: 50%; left: 50%; width: 100%; height: 3px; background: #c0392b; transform: translate(-50%, -50%) rotate(-45deg);
+        }
 
         #options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; height: 90px; }
         .option-btn {
@@ -238,13 +257,19 @@
         let gameState = 'start';
         let difficulty = 1;
         
-        let savedData = JSON.parse(localStorage.getItem('mathHero_v9')) || { coins: 0, boughtSkins: ['👮‍♂️'], currentSkin: '👮‍♂️' };
+        // تم تغيير مفتاح الحفظ إلى v11 لفرض تحديث الشخصيات
+        // تم تغيير الشخصية الافتراضية إلى الأمير
+        let savedData = JSON.parse(localStorage.getItem('mathHero_v11')) || { coins: 0, boughtSkins: ['🤴'], currentSkin: '🤴' };
         coins = savedData.coins;
 
+        // قائمة شخصيات رجالية واضحة
         const shopItems = [
-            { icon: '👮‍♂️', price: 0 }, { icon: '🦸‍♂️', price: 50 },
-            { icon: '🥷', price: 100 }, { icon: '🦁', price: 200 },
-            { icon: '🤖', price: 300 }, { icon: '🧙‍♂️', price: 500 }
+            { icon: '🤴', price: 0 },   // أمير (الافتراضي)
+            { icon: '🦸‍♂️', price: 50 },  // بطل خارق
+            { icon: '🥷', price: 100 }, // نينجا
+            { icon: '🧙‍♂️', price: 200 }, // ساحر
+            { icon: '🤖', price: 300 }, // روبوت
+            { icon: '🧔', price: 500 }  // رجل بلحية
         ];
 
         let hero = { x: 50, y: 0, sprite: savedData.currentSkin };
@@ -349,7 +374,7 @@
                 if(el.id.includes('lives')) el.innerText = toArabicNum(lives);
                 if(el.id.includes('coins')) el.innerText = toArabicNum(coins);
             });
-            localStorage.setItem('mathHero_v9', JSON.stringify({ coins, boughtSkins: savedData.boughtSkins, currentSkin: savedData.currentSkin }));
+            localStorage.setItem('mathHero_v11', JSON.stringify({ coins, boughtSkins: savedData.boughtSkins, currentSkin: savedData.currentSkin }));
         }
 
         function generateNewQuestion() {
@@ -359,12 +384,13 @@
                     n1 = Math.floor(Math.random() * 6); n2 = Math.floor(Math.random() * (11 - n1));
                     currentAnswer = n1 + n2;
                     document.getElementById('q-text').innerText = `${toArabicNum(n1)} + ${toArabicNum(n2)} = ؟`;
-                    vis = drawDots(n1) + '<span style="font-size:1.5rem">+</span>' + drawDots(n2);
+                    vis = drawDots(n1, false) + '<span style="font-size:1.5rem">+</span>' + drawDots(n2, false);
                 } else {
-                    n1 = Math.floor(Math.random() * 11); n2 = Math.floor(Math.random() * (n1 + 1));
+                    n1 = Math.floor(Math.random() * 11); 
+                    n2 = Math.floor(Math.random() * (n1 + 1));
                     currentAnswer = n1 - n2;
                     document.getElementById('q-text').innerText = `${toArabicNum(n1)} − ${toArabicNum(n2)} = ؟`;
-                    vis = drawDots(n1);
+                    vis = drawSubtractionVisual(n1, n2);
                 }
             } else {
                 if (Math.random() > 0.5) {
@@ -396,9 +422,22 @@
             });
         }
 
-        function drawDots(n) {
+        function drawDots(n, crossed = false) {
             if(gameMode === 'upper') return '';
-            let s = ''; for(let i=0;i<n;i++) s+='<span class="dot"></span>';
+            let s = ''; 
+            for(let i=0;i<n;i++) {
+                s += `<span class="dot ${crossed ? 'crossed' : ''}"></span>`;
+            }
+            return `<div class="visual-representation">${s}</div>`;
+        }
+
+        function drawSubtractionVisual(total, crossedCount) {
+            if(gameMode === 'upper') return '';
+            let s = '';
+            for(let i=0; i<total; i++) {
+                let isCrossed = i >= (total - crossedCount); 
+                s += `<span class="dot ${isCrossed ? 'crossed' : ''}"></span>`;
+            }
             return `<div class="visual-representation">${s}</div>`;
         }
 
@@ -449,8 +488,6 @@
             ctx.textAlign = 'center'; ctx.fillText(hero.sprite, canvas.width * 0.15, groundLevel + 5);
             ctx.shadowBlur = 0;
 
-            // --- منطق التصحيح لإظهار الوحوش ---
-            // إذا لم يوجد وحوش، أضف وحشاً فوراً (بدون شروط مسافة)
             if(enemies.length === 0) {
                  let baseSpeed = 1.5; 
                  enemies.push({
@@ -459,12 +496,11 @@
                     sprite: ['👾','👺','👹','🐉','🦖'][Math.floor(Math.random()*5)],
                     walkOffset: 0,
                     attackTimer: 0,
-                    maxAttackTime: 900 // حوالي 15 ثانية - وقت طويل جداً للتفكير
+                    maxAttackTime: 900
                 });
             } else if (enemies.length < 2) {
-                // إذا كان فيه وحش واحد، نتأكد إنه ابتعد مسافة كافية قبل إضافة الثاني
                 let lastEnemy = enemies[enemies.length-1];
-                if (lastEnemy.x < canvas.width - 250) { // مسافة أمان واضحة
+                if (lastEnemy.x < canvas.width - 250) {
                     let baseSpeed = 1.5; 
                      enemies.push({
                         x: canvas.width + 50, y: groundLevel + 5,
@@ -476,7 +512,6 @@
                     });
                 }
             }
-            // ------------------------------------
 
             for(let i=0; i<enemies.length; i++) {
                 let e = enemies[i];
