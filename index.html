@@ -21,7 +21,6 @@
             --accent-correct: #2ecc71;
             --accent-wrong: #e74c3c;
             --gold: #f1c40f;
-            --ice: #00d2ff;
             --bg-sky-top: #3498db;
             --bg-sky-bot: #87CEEB;
         }
@@ -88,14 +87,6 @@
             overflow: hidden;
             box-shadow: inset 0 -10px 20px rgba(0,0,0,0.1);
         }
-        /* تأثير التجميد */
-        #game-view.frozen::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 210, 255, 0.3); pointer-events: none;
-            box-shadow: inset 0 0 50px var(--ice);
-            animation: pulseIce 1s infinite;
-        }
-        @keyframes pulseIce { 0% {opacity:0.5} 50% {opacity:0.8} 100% {opacity:0.5} }
 
         canvas { width: 100%; height: 100%; display: block; }
 
@@ -106,19 +97,6 @@
             pointer-events: none; z-index: 20;
         }
         .hud-group { display: flex; gap: 15px; background: rgba(0,0,0,0.4); padding: 5px 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); }
-
-        /* زر التجميد */
-        #freeze-btn {
-            pointer-events: auto;
-            background: linear-gradient(to bottom, #00d2ff, #3a7bd5);
-            border: 2px solid white;
-            color: white; padding: 5px 15px; border-radius: 20px;
-            font-weight: bold; font-family: 'Cairo'; cursor: pointer;
-            display: flex; align-items: center; gap: 5px;
-            box-shadow: 0 4px 0 #005cbf; transition: 0.1s;
-        }
-        #freeze-btn:active { transform: translateY(4px); box-shadow: none; }
-        #freeze-btn:disabled { filter: grayscale(1); opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
 
         #controls-area {
             height: auto; min-height: 35vh;
@@ -207,9 +185,6 @@
                     <div><i class="fas fa-heart" style="color:#e74c3c"></i> <span class="arabic-num" id="lives-disp">٣</span></div>
                     <div><i class="fas fa-star" style="color:var(--gold)"></i> <span class="arabic-num" id="score-disp">٠</span></div>
                 </div>
-                <button id="freeze-btn" onclick="activateFreeze()">
-                    <i class="fas fa-snowflake"></i> تجميد (<span class="arabic-num" id="freeze-count">٣</span>)
-                </button>
             </div>
         </div>
         <div id="controls-area">
@@ -254,8 +229,8 @@
                 osc.type = 'sine'; osc.frequency.setValueAtTime(500, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.1); gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
             } else if (type === 'wrong') { 
                 osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime); osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.2); gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-            } else if (type === 'freeze') { // صوت التجميد
-                osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime); osc.frequency.linearRampToValueAtTime(200, audioCtx.currentTime + 1); gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 1); osc.start(); osc.stop(audioCtx.currentTime + 1);
+            } else if (type === 'charge') {
+                 // صوت تكتكة خفيف (اختياري)
             }
         }
 
@@ -264,13 +239,11 @@
         const ctx = canvas.getContext('2d');
         let gameMode = 'lower';
         let score = 0, lives = 3, coins = 0;
-        let freezeCount = 3; // عدد مرات التجميد
-        let isFrozen = false; // حالة التجميد
         let currentAnswer = 0;
         let gameState = 'start';
         let difficulty = 1;
         
-        let savedData = JSON.parse(localStorage.getItem('mathHero_v6')) || { coins: 0, boughtSkins: ['👮‍♂️'], currentSkin: '👮‍♂️' };
+        let savedData = JSON.parse(localStorage.getItem('mathHero_v7')) || { coins: 0, boughtSkins: ['👮‍♂️'], currentSkin: '👮‍♂️' };
         coins = savedData.coins;
 
         const shopItems = [
@@ -284,8 +257,9 @@
         let particles = [];
         let clouds = [];
         let lastSpawnTime = 0;
-        let spawnInterval = 3500; // زدنا الوقت بين الوحوش ليعطي راحة
+        let spawnInterval = 3000;
         let groundLevel = 0;
+        let castleX = 0; // موقع القلعة
 
         function toArabicNum(num) {
             return num.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
@@ -298,6 +272,7 @@
                 canvas.height = container.clientHeight;
                 groundLevel = canvas.height * 0.75;
                 hero.y = groundLevel + 5;
+                castleX = canvas.width * 0.25; // القلعة تأخذ ربع الشاشة اليسار
                 enemies.forEach(e => e.y = groundLevel + 5);
             }
         }
@@ -333,11 +308,17 @@
 
             ctx.fillStyle = '#27ae60'; ctx.fillRect(0, groundLevel, canvas.width, canvas.height - groundLevel);
             ctx.fillStyle = '#2ecc71'; ctx.fillRect(0, groundLevel, canvas.width, 10);
+            
+            // رسم خط الدفاع (الجدار)
+            ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 4; ctx.setLineDash([10, 5]);
+            ctx.beginPath(); ctx.moveTo(castleX + 20, groundLevel); ctx.lineTo(castleX + 20, groundLevel - 150); ctx.stroke();
+            ctx.setLineDash([]);
+
             drawCastle();
         }
 
         function drawCastle() {
-            const w = Math.min(canvas.width * 0.3, 150);
+            const w = Math.min(canvas.width * 0.25, 120);
             const h = canvas.height * 0.45;
             const x = 10;
             const base = groundLevel;
@@ -346,17 +327,10 @@
             ctx.beginPath(); ctx.ellipse(x + w/2, base, w/2, 10, 0, 0, Math.PI*2); ctx.fill();
 
             ctx.fillStyle = '#7f8c8d'; ctx.fillRect(x, base - h + 30, w, h - 30);
-            ctx.fillStyle = '#95a5a6';
-            for(let i=0; i<5; i++) ctx.fillRect(x + (Math.random()*w), base - (Math.random()*h), 10, 5);
-
             ctx.fillStyle = '#34495e';
             ctx.fillRect(x - 5, base - h + 20, w + 10, 15);
-            for(let i=0; i<4; i++) ctx.fillRect(x + (i * (w/3.5)), base - h, w/5, 20);
-
             ctx.fillStyle = '#4e342e';
             ctx.beginPath(); ctx.arc(x + w/2, base, w/3, Math.PI, 0); ctx.fill();
-            ctx.strokeStyle = '#2c3e50'; ctx.lineWidth = 3;
-            ctx.beginPath(); ctx.moveTo(x+w/2, base-w/3); ctx.lineTo(x+w/2, base); ctx.stroke();
             
             const flagY = base - h;
             ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
@@ -372,31 +346,11 @@
 
         function startGame() {
             gameState = 'playing';
-            score = 0; lives = 3; difficulty = 1; spawnInterval = 3500;
-            freezeCount = 3; isFrozen = false; // إعادة تعيين التجميد
+            score = 0; lives = 3; difficulty = 1; spawnInterval = 3000;
             enemies = []; particles = [];
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('game-container').classList.remove('hidden');
             resizeCanvas(); initClouds(); updateHUD(); generateNewQuestion(); gameLoop(0);
-        }
-
-        // دالة تفعيل التجميد
-        function activateFreeze() {
-            if (freezeCount > 0 && !isFrozen && gameState === 'playing') {
-                freezeCount--;
-                isFrozen = true;
-                playSound('freeze');
-                updateHUD();
-                
-                // إضافة تأثير بصري
-                document.getElementById('game-view').classList.add('frozen');
-
-                // إلغاء التجميد بعد 5 ثواني
-                setTimeout(() => {
-                    isFrozen = false;
-                    document.getElementById('game-view').classList.remove('frozen');
-                }, 5000);
-            }
         }
 
         function updateHUD() {
@@ -404,15 +358,8 @@
                 if(el.id.includes('score')) el.innerText = toArabicNum(score);
                 if(el.id.includes('lives')) el.innerText = toArabicNum(lives);
                 if(el.id.includes('coins')) el.innerText = toArabicNum(coins);
-                if(el.id === 'freeze-count') el.innerText = toArabicNum(freezeCount);
             });
-            
-            // تحديث حالة زر التجميد
-            const fBtn = document.getElementById('freeze-btn');
-            if (freezeCount <= 0 || isFrozen) fBtn.disabled = true;
-            else fBtn.disabled = false;
-
-            localStorage.setItem('mathHero_v6', JSON.stringify({ coins, boughtSkins: savedData.boughtSkins, currentSkin: savedData.currentSkin }));
+            localStorage.setItem('mathHero_v7', JSON.stringify({ coins, boughtSkins: savedData.boughtSkins, currentSkin: savedData.currentSkin }));
         }
 
         function generateNewQuestion() {
@@ -477,7 +424,11 @@
                     playSound('correct'); score += 10; coins += 2;
                     fireProjectile();
                     setTimeout(() => {
-                        if(enemies.length > 0) { createExplosion(enemies[0].x, enemies[0].y); enemies.shift(); playSound('explosion'); }
+                        if(enemies.length > 0) { 
+                            createExplosion(enemies[0].x, enemies[0].y); 
+                            enemies.shift(); // إزالة أول وحش فقط
+                            playSound('explosion'); 
+                        }
                     }, 200);
                     updateHUD(); setTimeout(generateNewQuestion, 800);
                 } else {
@@ -509,40 +460,75 @@
             ctx.shadowBlur = 0;
 
             if(t - lastSpawnTime > spawnInterval) {
-                // تقليل السرعة بشكل كبير (0.4 بدلاً من 1.5)
-                let baseSpeed = 0.4; 
-                let screenFactor = canvas.width > 800 ? 0.0005 : 0.0015; 
-                
+                let baseSpeed = 2; // سرعة المشي عادية
                 enemies.push({
                     x: canvas.width + 50, y: groundLevel + 5,
-                    speed: (canvas.width * screenFactor + baseSpeed) * difficulty,
+                    speed: baseSpeed * difficulty,
                     sprite: ['👾','👺','👹','🐉','🦖'][Math.floor(Math.random()*5)],
-                    walkOffset: 0
+                    walkOffset: 0,
+                    state: 'walking', // walking or attacking
+                    attackTimer: 0,
+                    maxAttackTime: 500 // كل ما زاد الرقم زاد وقت التفكير (حوالي 8 ثواني)
                 });
                 lastSpawnTime = t;
             }
 
-            for(let i=enemies.length-1; i>=0; i--) {
+            // حدود الوقوف (طابور)
+            // كل وحش يوقف خلف اللي قبله بمسافة
+            
+            for(let i=0; i<enemies.length; i++) {
                 let e = enemies[i];
-                
-                // إذا لم يكن اللعب مجمداً، حرك الوحوش
-                if (!isFrozen) {
+                let targetX = castleX + 40 + (i * 50); // ترتيب الطابور
+
+                if (e.x > targetX) {
+                    e.state = 'walking';
                     e.x -= e.speed;
-                    e.walkOffset += 0.1; // إبطاء حركة المشي أيضاً
-                }
-                
-                let bounce = Math.sin(e.walkOffset) * 5;
-                ctx.font = `${canvas.height * 0.12}px Cairo`;
-                ctx.fillText(e.sprite, e.x, e.y + bounce);
-                
-                if(e.x < canvas.width * 0.2) {
-                    enemies.splice(i,1); lives--; updateHUD(); playSound('wrong');
-                    document.getElementById('game-view').classList.add('shake');
-                    setTimeout(()=>document.getElementById('game-view').classList.remove('shake'), 400);
-                    if(lives <= 0) {
-                        gameState = 'over';
-                        document.getElementById('game-container').classList.add('hidden');
-                        document.getElementById('game-over-screen').classList.remove('hidden');
+                    e.walkOffset += 0.2;
+                    let bounce = Math.sin(e.walkOffset) * 5;
+                    ctx.font = `${canvas.height * 0.12}px Cairo`;
+                    ctx.fillText(e.sprite, e.x, e.y + bounce);
+                } else {
+                    // وصل لنقطة الوقوف
+                    e.state = 'attacking';
+                    e.x = targetX; // تثبيت الموقع
+                    
+                    // رسم الوحش واقف
+                    ctx.font = `${canvas.height * 0.12}px Cairo`;
+                    ctx.fillText(e.sprite, e.x, e.y);
+
+                    // إذا كان هو الأول في الطابور، يبدأ العداد
+                    if (i === 0) {
+                        e.attackTimer++;
+                        // رسم دائرة العداد
+                        let progress = e.attackTimer / e.maxAttackTime;
+                        ctx.strokeStyle = `rgb(${255 * progress}, ${255 * (1-progress)}, 0)`;
+                        ctx.lineWidth = 5;
+                        ctx.beginPath();
+                        ctx.arc(e.x, e.y - 70, 15, -Math.PI/2, (-Math.PI/2) + (Math.PI * 2 * progress));
+                        ctx.stroke();
+
+                        if (e.attackTimer >= e.maxAttackTime) {
+                            // هجوم!
+                            lives--; updateHUD(); playSound('wrong');
+                            document.getElementById('game-view').classList.add('shake');
+                            setTimeout(()=>document.getElementById('game-view').classList.remove('shake'), 400);
+                            
+                            // إزالة الوحش (لأنه هجم خلاص) أو إرجاعه للخلف؟
+                            // الأفضل إزالته كعقاب
+                            createExplosion(e.x, e.y);
+                            enemies.shift(); 
+                            i--; // تصحيح العداد
+
+                            if(lives <= 0) {
+                                gameState = 'over';
+                                document.getElementById('game-container').classList.add('hidden');
+                                document.getElementById('game-over-screen').classList.remove('hidden');
+                            }
+                        }
+                    } else {
+                        // الوحوش اللي في الخلف تنتظر (علامة Zzz)
+                        ctx.font = "15px Arial"; ctx.fillStyle = "#fff";
+                        ctx.fillText("...", e.x, e.y - 60);
                     }
                 }
             }
