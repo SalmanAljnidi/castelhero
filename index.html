@@ -28,48 +28,29 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             font-family: 'Cairo', sans-serif;
             background-color: var(--primary);
-            /* استخدام dvh لحل مشكلة أشرطة المتصفح في الجوال */
-            height: 100vh;
-            height: 100dvh; 
-            overflow: hidden;
-            touch-action: manipulation;
-            user-select: none;
+            height: 100vh; height: 100dvh;
+            overflow: hidden; touch-action: manipulation; user-select: none;
         }
 
-        /* --- الشاشات --- */
         .screen {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            color: white;
-            text-align: center;
-            padding: 20px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 100; color: white; text-align: center; padding: 20px;
         }
-
         .hidden { display: none !important; }
 
         h1 {
-            font-size: 2.2rem; margin: 0 0 15px 0;
-            color: var(--gold); text-shadow: 3px 3px 0 rgba(0,0,0,0.3);
-            font-weight: 800;
+            font-size: 2.2rem; margin: 0 0 15px 0; color: var(--gold);
+            text-shadow: 3px 3px 0 rgba(0,0,0,0.3); font-weight: 800;
         }
         
         .credits-box {
-            background: rgba(0,0,0,0.3);
-            padding: 15px;
-            border-radius: 20px;
-            margin-bottom: 25px;
-            width: 90%;
-            max-width: 400px;
+            background: rgba(0,0,0,0.3); padding: 15px; border-radius: 20px;
+            margin-bottom: 25px; width: 90%; max-width: 400px;
             border: 1px solid rgba(255,255,255,0.1);
         }
         .credits-name { font-size: 1.1rem; margin-bottom: 10px; color: #ecf0f1; font-weight: bold; }
@@ -93,19 +74,12 @@
         .btn-gold { background: var(--gold); color: var(--primary); box-shadow: 0 5px 0 #c49f0c; }
 
         .mode-select { display: flex; gap: 10px; margin-bottom: 20px; width: 90%; max-width: 400px; }
-        .mode-btn { flex: 1; padding: 10px; opacity: 0.6; transition: 0.3s; border: 3px solid transparent; font-size: 1rem; }
-        .mode-btn.active { opacity: 1; border-color: var(--gold); transform: scale(1.05); }
+        .mode-btn { flex: 1; padding: 10px; opacity: 0.6; transition: 0.3s; border: 3px solid transparent; font-size: 1rem; color: white; background: rgba(255,255,255,0.1); border-radius: 10px; cursor: pointer; }
+        .mode-btn.active { opacity: 1; border-color: var(--gold); background: rgba(255,255,255,0.2); transform: scale(1.05); }
 
-        /* --- اللعبة --- */
-        #game-container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-
+        #game-container { display: flex; flex-direction: column; height: 100%; }
         #game-view {
-            flex: 5; /* مساحة أكبر للرسم */
-            position: relative;
+            flex: 5; position: relative;
             background: linear-gradient(to bottom, var(--bg-sky) 60%, var(--bg-ground) 60%);
             overflow: hidden;
         }
@@ -115,26 +89,18 @@
             position: absolute; top: 10px; left: 10px; right: 10px;
             display: flex; justify-content: space-between;
             font-size: 1.2rem; color: white; text-shadow: 1px 1px 2px #000;
-            pointer-events: none;
-            background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 15px;
+            pointer-events: none; background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 15px;
         }
 
         #controls-area {
-            flex: 4;
-            background: var(--secondary);
-            padding: 10px 15px 30px 15px; /* زيادة الحاشية السفلية للجوال */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 10px;
-            border-top: 5px solid var(--primary);
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
-            z-index: 10;
+            flex: 4; background: var(--secondary);
+            padding: 10px 15px 30px 15px;
+            display: flex; flex-direction: column; justify-content: center; gap: 10px;
+            border-top: 5px solid var(--primary); box-shadow: 0 -5px 20px rgba(0,0,0,0.3); z-index: 10;
         }
 
         #question-box {
-            background: white; color: var(--primary);
-            padding: 10px; border-radius: 15px;
+            background: white; color: var(--primary); padding: 10px; border-radius: 15px;
             text-align: center; font-size: 1.8rem; font-weight: 800;
             box-shadow: inset 0 -4px 0 rgba(0,0,0,0.1);
             min-height: 70px; display: flex; flex-direction: column; justify-content: center;
@@ -142,19 +108,14 @@
         .visual-representation { display: flex; justify-content: center; gap: 4px; margin-top: 5px; flex-wrap: wrap; }
         .dot { width: 10px; height: 10px; background: var(--accent-wrong); border-radius: 50%; display: inline-block; box-shadow: 1px 1px 0 rgba(0,0,0,0.2); }
 
-        #options-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-            height: 80px; /* ارتفاع ثابت للأزرار */
-        }
+        #options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; height: 80px; }
         .option-btn {
             background: white; color: var(--primary); border: none;
-            font-size: 1.6rem; font-weight: bold;
-            border-radius: 12px; cursor: pointer;
-            box-shadow: 0 4px 0 #bdc3c7; transition: transform 0.1s;
-            font-family: 'Cairo', sans-serif;
-            height: 100%; /* ملء المساحة */
+            font-size: 1.6rem; font-weight: bold; border-radius: 12px; cursor: pointer;
+            box-shadow: 0 4px 0 #bdc3c7; transition: transform 0.1s; font-family: 'Cairo', sans-serif; height: 100%;
         }
         .option-btn:active { transform: translateY(4px); box-shadow: none; }
+        .option-btn:disabled { cursor: not-allowed; opacity: 0.9; }
         
         .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake {
@@ -164,11 +125,7 @@
             40%, 60% { transform: translate3d(6px, 0, 0); }
         }
 
-        /* متجر */
-        .shop-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0;
-            width: 100%; max-width: 400px;
-        }
+        .shop-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; width: 100%; max-width: 400px; }
         .shop-item {
             background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px;
             border: 2px solid transparent; cursor: pointer; position: relative;
@@ -176,14 +133,12 @@
         .shop-item.selected { border-color: var(--gold); background: rgba(241, 196, 15, 0.2); }
         .shop-item.locked { opacity: 0.5; filter: grayscale(1); }
         .shop-icon { font-size: 2.5rem; }
-        
     </style>
 </head>
 <body>
 
     <div id="start-screen" class="screen">
         <h1>حارس القلعة الحسابية</h1>
-        
         <div class="credits-box">
             <div class="credits-name">فكرة وتصميم: أ. سلمان الجنيدي</div>
             <div class="social-icons">
@@ -191,13 +146,11 @@
                 <a href="https://snapchat.com/t/2tVDWcXq" target="_blank"><i class="fab fa-snapchat"></i></a>
             </div>
         </div>
-
         <p style="margin: 0 0 10px 0; color: #ecf0f1;">اختر المرحلة الدراسية:</p>
         <div class="mode-select">
-            <button id="mode-lower" class="btn btn-blue mode-btn active" onclick="setMode('lower')">الصفوف الأولية</button>
-            <button id="mode-upper" class="btn btn-blue mode-btn" onclick="setMode('upper')">الصفوف العليا</button>
+            <button id="mode-lower" class="mode-btn active" onclick="setMode('lower')">الصفوف الأولية</button>
+            <button id="mode-upper" class="mode-btn" onclick="setMode('upper')">الصفوف العليا</button>
         </div>
-
         <button class="btn" onclick="startGame()">ابدأ التحدي! 🎮</button>
         <button class="btn btn-gold" onclick="showShop()">المتجر 🛒</button>
     </div>
@@ -224,7 +177,6 @@
                 <div class="hud-item"><i class="fas fa-star" style="color:var(--gold)"></i> <span class="arabic-num" id="score-disp">٠</span></div>
             </div>
         </div>
-
         <div id="controls-area">
             <div id="question-box">
                 <div id="q-text">...</div>
@@ -239,20 +191,16 @@
     </div>
 
     <script>
-        // --- إعداد ملف التثبيت (Manifest) ديناميكياً ---
+        // إعداد التثبيت
         const manifestData = {
-            "name": "حارس القلعة",
-            "short_name": "القلعة",
-            "start_url": ".",
-            "display": "standalone",
-            "background_color": "#2c3e50",
-            "theme_color": "#2c3e50",
+            "name": "حارس القلعة", "short_name": "القلعة", "start_url": ".",
+            "display": "standalone", "background_color": "#2c3e50", "theme_color": "#2c3e50",
             "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/3069/3069172.png", "sizes": "192x192", "type": "image/png"}]
         };
         const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
         document.getElementById('manifest-placeholder').href = URL.createObjectURL(blob);
 
-        // --- المتغيرات ---
+        // متغيرات اللعبة
         const canvas = document.getElementById('game-canvas');
         const ctx = canvas.getContext('2d');
         let gameMode = 'lower';
@@ -261,7 +209,7 @@
         let gameState = 'start';
         let difficulty = 1;
         
-        let savedData = JSON.parse(localStorage.getItem('mathHero_v3')) || { coins: 0, boughtSkins: ['👮‍♂️'], currentSkin: '👮‍♂️' };
+        let savedData = JSON.parse(localStorage.getItem('mathHero_v4')) || { coins: 0, boughtSkins: ['👮‍♂️'], currentSkin: '👮‍♂️' };
         coins = savedData.coins;
 
         const shopItems = [
@@ -277,52 +225,42 @@
         let spawnInterval = 2500;
         let groundLevel = 0;
 
-        // --- دوال مساعدة ---
         function toArabicNum(num) {
             return num.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
-        }
-        
-        function fromArabicNum(str) {
-             return parseInt(str.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)));
         }
 
         function resizeCanvas() {
             const container = document.getElementById('game-view');
-            canvas.width = container.clientWidth;
-            canvas.height = container.clientHeight;
-            // تحديد مستوى الأرض بالنسبة لحجم الشاشة
-            groundLevel = canvas.height * 0.6; 
-            hero.y = groundLevel + 10;
+            if(container) {
+                canvas.width = container.clientWidth;
+                canvas.height = container.clientHeight;
+                groundLevel = canvas.height * 0.6; 
+                hero.y = groundLevel + 10;
+            }
         }
         window.addEventListener('resize', resizeCanvas);
 
-        // --- رسم القلعة (أفضل من المستطيل) ---
         function drawCastle() {
-            const w = canvas.width * 0.25; // عرض القلعة
-            const h = canvas.height * 0.4; // ارتفاعها
+            const w = canvas.width * 0.25; 
+            const h = canvas.height * 0.4; 
             const x = 0;
             const y = groundLevel - h + 20;
 
-            ctx.fillStyle = '#7f8c8d'; // لون الجدران
-            // البرج الأيسر
+            ctx.fillStyle = '#7f8c8d'; 
             ctx.fillRect(x, y + 20, w * 0.3, h - 20);
-            // البرج الأيمن (الرئيسي)
             ctx.fillRect(x + w * 0.3, y - 20, w * 0.4, h + 20);
             
-            // الشرفات (Battlements)
             ctx.fillStyle = '#95a5a6';
             ctx.fillRect(x, y + 10, w * 0.1, 10);
             ctx.fillRect(x + w * 0.2, y + 10, w * 0.1, 10);
             ctx.fillRect(x + w * 0.3, y - 30, w * 0.12, 10);
             ctx.fillRect(x + w * 0.58, y - 30, w * 0.12, 10);
 
-            // البوابة
-            ctx.fillStyle = '#5d4037'; // بني غامق
+            ctx.fillStyle = '#5d4037';
             ctx.beginPath();
             ctx.arc(x + w * 0.5, groundLevel + 20, w * 0.15, Math.PI, 0);
             ctx.fill();
             
-            // العلم
             ctx.fillStyle = '#c0392b';
             ctx.beginPath();
             ctx.moveTo(x + w * 0.5, y - 60);
@@ -336,17 +274,16 @@
             ctx.stroke();
         }
 
-        // --- اللعبة ---
         function startGame() {
             gameState = 'playing';
             score = 0; lives = 3; difficulty = 1; spawnInterval = 2500;
             enemies = []; particles = [];
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('game-container').classList.remove('hidden');
-            resizeCanvas();
+            setTimeout(resizeCanvas, 100); 
             updateHUD();
             generateNewQuestion();
-            gameLoop();
+            gameLoop(0);
         }
 
         function updateHUD() {
@@ -355,7 +292,7 @@
                 if(el.id.includes('lives')) el.innerText = toArabicNum(lives);
                 if(el.id.includes('coins')) el.innerText = toArabicNum(coins);
             });
-            localStorage.setItem('mathHero_v3', JSON.stringify({ coins, boughtSkins: savedData.boughtSkins, currentSkin: savedData.currentSkin }));
+            localStorage.setItem('mathHero_v4', JSON.stringify({ coins, boughtSkins: savedData.boughtSkins, currentSkin: savedData.currentSkin }));
         }
 
         function generateNewQuestion() {
@@ -390,7 +327,6 @@
             }
             document.getElementById('q-visual').innerHTML = vis;
             
-            // خيارات
             let opts = [currentAnswer];
             while(opts.length < 3) {
                 let r = currentAnswer + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random()*5)+1);
@@ -401,6 +337,7 @@
             const btns = document.querySelectorAll('.option-btn');
             btns.forEach((b, i) => {
                 b.innerText = toArabicNum(opts[i]);
+                b.setAttribute('data-val', opts[i]); // تخزين القيمة الحقيقية للرقم
                 b.disabled = false;
                 b.style.backgroundColor = 'white';
                 b.style.color = 'var(--primary)';
@@ -413,26 +350,42 @@
             return `<div class="visual-representation">${s}</div>`;
         }
 
+        // دالة التحقق المعدلة والمحمية
         function checkAnswer(btn) {
-            let val = fromArabicNum(btn.innerText);
-            const allBtns = document.querySelectorAll('.option-btn');
-            allBtns.forEach(b => b.disabled = true);
-            
-            if(val === currentAnswer) {
-                btn.style.backgroundColor = '#2ecc71';
-                btn.style.color = 'white';
-                score += 10; coins += 2;
-                if(enemies.length) { createExplosion(enemies[0].x, enemies[0].y); enemies.shift(); }
-                updateHUD();
-                setTimeout(generateNewQuestion, 200);
-            } else {
-                btn.style.backgroundColor = '#e74c3c';
-                btn.style.color = 'white';
-                document.getElementById('controls-area').classList.add('shake');
-                setTimeout(() => {
-                    document.getElementById('controls-area').classList.remove('shake');
-                    allBtns.forEach(b => { b.disabled = false; b.style.backgroundColor = 'white'; b.style.color = 'var(--primary)'; });
-                }, 400);
+            try {
+                // قراءة القيمة من البيانات المخفية وليس من النص
+                let val = parseInt(btn.getAttribute('data-val'));
+                
+                const allBtns = document.querySelectorAll('.option-btn');
+                allBtns.forEach(b => b.disabled = true);
+                
+                if(val === currentAnswer) {
+                    btn.style.backgroundColor = '#2ecc71'; // أخضر
+                    btn.style.color = 'white';
+                    score += 10; coins += 2;
+                    if(enemies.length > 0) { 
+                        createExplosion(enemies[0].x, enemies[0].y); 
+                        enemies.shift(); 
+                    }
+                    updateHUD();
+                    setTimeout(generateNewQuestion, 300);
+                } else {
+                    btn.style.backgroundColor = '#e74c3c'; // أحمر
+                    btn.style.color = 'white';
+                    document.getElementById('controls-area').classList.add('shake');
+                    setTimeout(() => {
+                        document.getElementById('controls-area').classList.remove('shake');
+                        allBtns.forEach(b => { 
+                            b.disabled = false; 
+                            b.style.backgroundColor = 'white'; 
+                            b.style.color = 'var(--primary)'; 
+                        });
+                    }, 500);
+                }
+            } catch (e) {
+                console.error("Error in checkAnswer:", e);
+                // في حال حدوث خطأ نعيد تفعيل الأزرار فوراً
+                document.querySelectorAll('.option-btn').forEach(b => b.disabled = false);
             }
         }
 
@@ -440,18 +393,13 @@
             if(gameState !== 'playing') return;
             ctx.clearRect(0,0,canvas.width,canvas.height);
             
-            // رسم القلعة الجديدة
             drawCastle();
 
-            // رسم البطل
             ctx.font = `${canvas.height * 0.15}px Cairo`;
             ctx.textAlign = 'center';
             ctx.fillText(hero.sprite, canvas.width * 0.15, groundLevel + 10);
 
-            // إضافة وحوش
             if(t - lastSpawnTime > spawnInterval) {
-                // موازنة السرعة: إذا الشاشة كبيرة (كمبيوتر) نقلل المعامل، إذا صغيرة (جوال) نرفعه شوي
-                // الأساس: سرعة ثابتة تقريباً بغض النظر عن عرض الشاشة
                 let baseSpeed = 1.5; 
                 let screenFactor = canvas.width > 800 ? 0.001 : 0.003; 
                 
@@ -464,7 +412,6 @@
                 lastSpawnTime = t;
             }
 
-            // حركة الوحوش
             for(let i=enemies.length-1; i>=0; i--) {
                 let e = enemies[i];
                 e.x -= e.speed;
@@ -481,7 +428,6 @@
                 }
             }
 
-            // انفجارات
             for(let i=particles.length-1; i>=0; i--) {
                 let p = particles[i];
                 p.x += p.vx; p.y += p.vy; p.life -= 0.05;
@@ -495,7 +441,16 @@
             requestAnimationFrame(gameLoop);
         }
 
-        // المتجر
+        function createExplosion(x, y) {
+            for(let i=0; i<20; i++) {
+                particles.push({
+                    x: x, y: y,
+                    vx: (Math.random()-0.5) * 10, vy: (Math.random()-0.5) * 10,
+                    life: 1, color: `hsl(${Math.random()*360}, 100%, 50%)`
+                });
+            }
+        }
+
         function renderShop() {
             const c = document.getElementById('shop-items-container'); c.innerHTML = '';
             shopItems.forEach(item => {
@@ -519,7 +474,6 @@
         function setMode(m) { gameMode = m; document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active')); document.getElementById('mode-'+m).classList.add('active'); }
         function resetGame() { document.getElementById('game-over-screen').classList.add('hidden'); startGame(); }
 
-        resizeCanvas();
     </script>
 </body>
 </html>
