@@ -238,7 +238,7 @@
         let gameState = 'start';
         let difficulty = 1;
         
-        let savedData = JSON.parse(localStorage.getItem('mathHero_v8')) || { coins: 0, boughtSkins: ['👮‍♂️'], currentSkin: '👮‍♂️' };
+        let savedData = JSON.parse(localStorage.getItem('mathHero_v9')) || { coins: 0, boughtSkins: ['👮‍♂️'], currentSkin: '👮‍♂️' };
         coins = savedData.coins;
 
         const shopItems = [
@@ -349,7 +349,7 @@
                 if(el.id.includes('lives')) el.innerText = toArabicNum(lives);
                 if(el.id.includes('coins')) el.innerText = toArabicNum(coins);
             });
-            localStorage.setItem('mathHero_v8', JSON.stringify({ coins, boughtSkins: savedData.boughtSkins, currentSkin: savedData.currentSkin }));
+            localStorage.setItem('mathHero_v9', JSON.stringify({ coins, boughtSkins: savedData.boughtSkins, currentSkin: savedData.currentSkin }));
         }
 
         function generateNewQuestion() {
@@ -449,60 +449,65 @@
             ctx.textAlign = 'center'; ctx.fillText(hero.sprite, canvas.width * 0.15, groundLevel + 5);
             ctx.shadowBlur = 0;
 
-            // نظام المبارزة: وحش واحد أو اثنين كحد أقصى
-            if(enemies.length < 2) {
-                // إضافة وحش جديد فقط إذا كان العدد قليل
-                // يتم إضافة مسافة كبيرة بين الوحش الحالي والجديد
-                let lastX = enemies.length > 0 ? enemies[enemies.length-1].x : canvas.width;
-                if (lastX < canvas.width - 150) { // مسافة أمان
+            // --- منطق التصحيح لإظهار الوحوش ---
+            // إذا لم يوجد وحوش، أضف وحشاً فوراً (بدون شروط مسافة)
+            if(enemies.length === 0) {
+                 let baseSpeed = 1.5; 
+                 enemies.push({
+                    x: canvas.width + 50, y: groundLevel + 5,
+                    speed: baseSpeed * difficulty,
+                    sprite: ['👾','👺','👹','🐉','🦖'][Math.floor(Math.random()*5)],
+                    walkOffset: 0,
+                    attackTimer: 0,
+                    maxAttackTime: 900 // حوالي 15 ثانية - وقت طويل جداً للتفكير
+                });
+            } else if (enemies.length < 2) {
+                // إذا كان فيه وحش واحد، نتأكد إنه ابتعد مسافة كافية قبل إضافة الثاني
+                let lastEnemy = enemies[enemies.length-1];
+                if (lastEnemy.x < canvas.width - 250) { // مسافة أمان واضحة
                     let baseSpeed = 1.5; 
-                    enemies.push({
+                     enemies.push({
                         x: canvas.width + 50, y: groundLevel + 5,
                         speed: baseSpeed * difficulty,
                         sprite: ['👾','👺','👹','🐉','🦖'][Math.floor(Math.random()*5)],
                         walkOffset: 0,
                         attackTimer: 0,
-                        maxAttackTime: 800 // حوالي 13 ثانية - وقت طويل للتفكير
+                        maxAttackTime: 900
                     });
                 }
             }
+            // ------------------------------------
 
             for(let i=0; i<enemies.length; i++) {
                 let e = enemies[i];
-                // نقطة التوقف: الوحش الأول يقف عند الخط، الثاني يقف خلفه
-                let stopPoint = castleX + 40 + (i * 60);
+                let stopPoint = castleX + 40 + (i * 70);
 
                 if (e.x > stopPoint) {
-                    // مرحلة المشي
                     e.x -= e.speed;
                     e.walkOffset += 0.15;
                     let bounce = Math.sin(e.walkOffset) * 5;
                     ctx.font = `${canvas.height * 0.12}px Cairo`;
                     ctx.fillText(e.sprite, e.x, e.y + bounce);
                 } else {
-                    // مرحلة الوقوف والهجوم
                     e.x = stopPoint;
                     ctx.font = `${canvas.height * 0.12}px Cairo`;
                     ctx.fillText(e.sprite, e.x, e.y);
 
-                    // فقط الوحش الأول هو من يهاجم (المبارزة)
                     if (i === 0) {
                         e.attackTimer++;
-                        // رسم شريط الوقت فوق رأسه
                         let barWidth = 60;
                         let percent = e.attackTimer / e.maxAttackTime;
                         ctx.fillStyle = "#555";
                         ctx.fillRect(e.x - barWidth/2, e.y - 70, barWidth, 8);
-                        ctx.fillStyle = percent > 0.7 ? "#e74c3c" : "#2ecc71"; // أخضر ثم يتحول لأحمر
+                        ctx.fillStyle = percent > 0.7 ? "#e74c3c" : "#2ecc71";
                         ctx.fillRect(e.x - barWidth/2, e.y - 70, barWidth * (1-percent), 8);
 
                         if (e.attackTimer >= e.maxAttackTime) {
-                            // انتهى الوقت - هجوم!
                             lives--; updateHUD(); playSound('wrong');
                             document.getElementById('game-view').classList.add('shake');
                             setTimeout(()=>document.getElementById('game-view').classList.remove('shake'), 400);
                             createExplosion(e.x, e.y);
-                            enemies.shift(); // يموت بعد الهجوم
+                            enemies.shift(); 
                             i--; 
                             if(lives <= 0) {
                                 gameState = 'over';
@@ -511,7 +516,6 @@
                             }
                         }
                     } else {
-                        // الوحش الثاني ينتظر بصمت
                          ctx.font = "20px Arial"; ctx.fillStyle = "#fff";
                          ctx.fillText("⏳", e.x, e.y - 60);
                     }
