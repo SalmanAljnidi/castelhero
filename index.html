@@ -21,7 +21,8 @@
             --accent-correct: #2ecc71;
             --accent-wrong: #e74c3c;
             --gold: #f1c40f;
-            --bg-sky: #87CEEB;
+            --bg-sky-top: #3498db;
+            --bg-sky-bot: #87CEEB;
             --bg-ground: #27ae60;
         }
 
@@ -44,14 +45,15 @@
         .hidden { display: none !important; }
 
         h1 {
-            font-size: 2.2rem; margin: 0 0 15px 0; color: var(--gold);
-            text-shadow: 3px 3px 0 rgba(0,0,0,0.3); font-weight: 800;
+            font-size: 2rem; margin: 0 0 10px 0; color: var(--gold);
+            text-shadow: 3px 3px 0 rgba(0,0,0,0.5); font-weight: 800;
         }
         
         .credits-box {
-            background: rgba(0,0,0,0.3); padding: 15px; border-radius: 20px;
-            margin-bottom: 25px; width: 90%; max-width: 400px;
+            background: rgba(0,0,0,0.4); padding: 15px; border-radius: 15px;
+            margin-bottom: 20px; width: 90%; max-width: 400px;
             border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px);
         }
         .credits-name { font-size: 1.1rem; margin-bottom: 10px; color: #ecf0f1; font-weight: bold; }
         .social-icons { display: flex; justify-content: center; gap: 25px; }
@@ -61,61 +63,69 @@
         }
         .social-icons a:hover { transform: scale(1.2); }
         .fa-whatsapp { color: #25D366; }
-        .fa-snapchat { color: #FFFC00; text-shadow: 0 0 2px #000; }
+        .fa-snapchat { color: #FFFC00; text-shadow: 0 0 5px #000; }
 
         .btn {
-            background: var(--accent-correct); color: white; border: none;
-            padding: 12px 30px; font-size: 1.2rem; border-radius: 50px;
-            margin: 8px; cursor: pointer; font-family: 'Cairo', sans-serif;
-            box-shadow: 0 5px 0 #219150; transition: all 0.1s; width: 90%; max-width: 350px; font-weight: bold;
+            background: linear-gradient(to bottom, #2ecc71, #27ae60); color: white; border: none;
+            padding: 12px 40px; font-size: 1.3rem; border-radius: 50px;
+            margin: 10px; cursor: pointer; font-family: 'Cairo', sans-serif;
+            box-shadow: 0 5px 0 #1e8449, 0 10px 10px rgba(0,0,0,0.2); 
+            transition: all 0.1s; width: 90%; max-width: 350px; font-weight: bold;
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
         }
         .btn:active { transform: translateY(5px); box-shadow: none; }
-        .btn-blue { background: #3498db; box-shadow: 0 5px 0 #2980b9; }
-        .btn-gold { background: var(--gold); color: var(--primary); box-shadow: 0 5px 0 #c49f0c; }
+        .btn-blue { background: linear-gradient(to bottom, #3498db, #2980b9); box-shadow: 0 5px 0 #20638f; }
+        .btn-gold { background: linear-gradient(to bottom, #f1c40f, #f39c12); color: var(--primary); box-shadow: 0 5px 0 #d35400; }
 
         .mode-select { display: flex; gap: 10px; margin-bottom: 20px; width: 90%; max-width: 400px; }
-        .mode-btn { flex: 1; padding: 10px; opacity: 0.6; transition: 0.3s; border: 3px solid transparent; font-size: 1rem; color: white; background: rgba(255,255,255,0.1); border-radius: 10px; cursor: pointer; }
-        .mode-btn.active { opacity: 1; border-color: var(--gold); background: rgba(255,255,255,0.2); transform: scale(1.05); }
+        .mode-btn { flex: 1; padding: 12px; opacity: 0.7; transition: 0.3s; border: 2px solid rgba(255,255,255,0.2); font-size: 1rem; color: white; background: rgba(0,0,0,0.2); border-radius: 12px; cursor: pointer; font-family: 'Cairo', sans-serif;}
+        .mode-btn.active { opacity: 1; border-color: var(--gold); background: rgba(241, 196, 15, 0.2); transform: scale(1.05); font-weight: bold; }
 
         #game-container { display: flex; flex-direction: column; height: 100%; }
+        
         #game-view {
-            flex: 5; position: relative;
-            background: linear-gradient(to bottom, var(--bg-sky) 60%, var(--bg-ground) 60%);
+            flex: 1; position: relative; /* يأخذ المساحة المتاحة */
+            background: linear-gradient(to bottom, var(--bg-sky-top), var(--bg-sky-bot));
             overflow: hidden;
+            box-shadow: inset 0 -10px 20px rgba(0,0,0,0.1);
         }
         canvas { width: 100%; height: 100%; display: block; }
 
         #hud {
             position: absolute; top: 10px; left: 10px; right: 10px;
             display: flex; justify-content: space-between;
-            font-size: 1.2rem; color: white; text-shadow: 1px 1px 2px #000;
-            pointer-events: none; background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 15px;
+            font-size: 1.3rem; color: white; text-shadow: 2px 2px 0 #000;
+            pointer-events: none; background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 20px;
+            border: 2px solid rgba(255,255,255,0.2);
         }
 
         #controls-area {
-            flex: 4; background: var(--secondary);
-            padding: 10px 15px 30px 15px;
-            display: flex; flex-direction: column; justify-content: center; gap: 10px;
-            border-top: 5px solid var(--primary); box-shadow: 0 -5px 20px rgba(0,0,0,0.3); z-index: 10;
+            height: auto; /* ارتفاع تلقائي */
+            min-height: 35vh; /* لكن لا يقل عن 35% من الشاشة */
+            background: var(--secondary);
+            padding: 15px 20px calc(20px + env(safe-area-inset-bottom)) 20px;
+            display: flex; flex-direction: column; justify-content: flex-start; gap: 15px;
+            border-top: 6px solid var(--primary); 
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5); z-index: 10;
         }
 
         #question-box {
-            background: white; color: var(--primary); padding: 10px; border-radius: 15px;
-            text-align: center; font-size: 1.8rem; font-weight: 800;
-            box-shadow: inset 0 -4px 0 rgba(0,0,0,0.1);
-            min-height: 70px; display: flex; flex-direction: column; justify-content: center;
+            background: #fff; color: var(--primary); padding: 10px; border-radius: 15px;
+            text-align: center; font-size: 2rem; font-weight: 800;
+            box-shadow: 0 4px 0 #bdc3c7;
+            min-height: 80px; display: flex; flex-direction: column; justify-content: center;
         }
-        .visual-representation { display: flex; justify-content: center; gap: 4px; margin-top: 5px; flex-wrap: wrap; }
-        .dot { width: 10px; height: 10px; background: var(--accent-wrong); border-radius: 50%; display: inline-block; box-shadow: 1px 1px 0 rgba(0,0,0,0.2); }
+        .visual-representation { display: flex; justify-content: center; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
+        .dot { width: 14px; height: 14px; background: var(--accent-wrong); border-radius: 50%; display: inline-block; box-shadow: inset -2px -2px rgba(0,0,0,0.2); border: 1px solid rgba(0,0,0,0.1); }
 
-        #options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; height: 80px; }
+        #options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; height: 90px; }
         .option-btn {
-            background: white; color: var(--primary); border: none;
-            font-size: 1.6rem; font-weight: bold; border-radius: 12px; cursor: pointer;
-            box-shadow: 0 4px 0 #bdc3c7; transition: transform 0.1s; font-family: 'Cairo', sans-serif; height: 100%;
+            background: #ecf0f1; color: var(--primary); border: none;
+            font-size: 1.8rem; font-weight: bold; border-radius: 15px; cursor: pointer;
+            box-shadow: 0 6px 0 #bdc3c7; transition: transform 0.1s; font-family: 'Cairo', sans-serif; height: 100%;
         }
-        .option-btn:active { transform: translateY(4px); box-shadow: none; }
-        .option-btn:disabled { cursor: not-allowed; opacity: 0.9; }
+        .option-btn:active { transform: translateY(6px); box-shadow: none; }
+        .option-btn:disabled { opacity: 1; cursor: default; } /* Keep opacity so user sees result */
         
         .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake {
@@ -128,11 +138,12 @@
         .shop-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; width: 100%; max-width: 400px; }
         .shop-item {
             background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px;
-            border: 2px solid transparent; cursor: pointer; position: relative;
+            border: 2px solid transparent; cursor: pointer; position: relative; transition: 0.2s;
         }
-        .shop-item.selected { border-color: var(--gold); background: rgba(241, 196, 15, 0.2); }
+        .shop-item:active { transform: scale(0.95); }
+        .shop-item.selected { border-color: var(--gold); background: rgba(241, 196, 15, 0.2); box-shadow: 0 0 15px rgba(241, 196, 15, 0.3); }
         .shop-item.locked { opacity: 0.5; filter: grayscale(1); }
-        .shop-icon { font-size: 2.5rem; }
+        .shop-icon { font-size: 2.5rem; filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.3)); }
     </style>
 </head>
 <body>
@@ -151,7 +162,7 @@
             <button id="mode-lower" class="mode-btn active" onclick="setMode('lower')">الصفوف الأولية</button>
             <button id="mode-upper" class="mode-btn" onclick="setMode('upper')">الصفوف العليا</button>
         </div>
-        <button class="btn" onclick="startGame()">ابدأ التحدي! 🎮</button>
+        <button class="btn" onclick="initAudioAndStart()">ابدأ المعركة! ⚔️</button>
         <button class="btn btn-gold" onclick="showShop()">المتجر 🛒</button>
     </div>
 
@@ -163,7 +174,7 @@
     </div>
 
     <div id="game-over-screen" class="screen hidden">
-        <h1 style="color: var(--accent-wrong);">انتهت المحاولة!</h1>
+        <h1 style="color: var(--accent-wrong);">سقطت القلعة!</h1>
         <p style="font-size: 1.5rem;">جمعت: <span class="arabic-num" id="final-score">٠</span> نقطة</p>
         <button class="btn" onclick="resetGame()">لعب مرة أخرى</button>
         <button class="btn btn-blue" onclick="location.reload()">القائمة الرئيسية</button>
@@ -191,16 +202,62 @@
     </div>
 
     <script>
-        // إعداد التثبيت
+        // --- إعداد التثبيت ---
         const manifestData = {
             "name": "حارس القلعة", "short_name": "القلعة", "start_url": ".",
             "display": "standalone", "background_color": "#2c3e50", "theme_color": "#2c3e50",
+            "orientation": "portrait",
             "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/3069/3069172.png", "sizes": "192x192", "type": "image/png"}]
         };
         const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
         document.getElementById('manifest-placeholder').href = URL.createObjectURL(blob);
 
-        // متغيرات اللعبة
+        // --- نظام الصوت (Sound System) ---
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            if (type === 'correct') { // Ding!
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'wrong') { // Buzz
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'shoot') { // Pew
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.15);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+            } else if (type === 'explosion') { // Boom
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
+        // --- المتغيرات الأساسية ---
         const canvas = document.getElementById('game-canvas');
         const ctx = canvas.getContext('2d');
         let gameMode = 'lower';
@@ -209,7 +266,7 @@
         let gameState = 'start';
         let difficulty = 1;
         
-        let savedData = JSON.parse(localStorage.getItem('mathHero_v4')) || { coins: 0, boughtSkins: ['👮‍♂️'], currentSkin: '👮‍♂️' };
+        let savedData = JSON.parse(localStorage.getItem('mathHero_v5')) || { coins: 0, boughtSkins: ['👮‍♂️'], currentSkin: '👮‍♂️' };
         coins = savedData.coins;
 
         const shopItems = [
@@ -221,6 +278,7 @@
         let hero = { x: 50, y: 0, sprite: savedData.currentSkin };
         let enemies = [];
         let particles = [];
+        let clouds = [];
         let lastSpawnTime = 0;
         let spawnInterval = 2500;
         let groundLevel = 0;
@@ -234,44 +292,106 @@
             if(container) {
                 canvas.width = container.clientWidth;
                 canvas.height = container.clientHeight;
-                groundLevel = canvas.height * 0.6; 
-                hero.y = groundLevel + 10;
+                groundLevel = canvas.height * 0.75; // الأرض عند 75% من الشاشة
+                
+                // تصحيح مواقع الكائنات الحالية عند تغيير حجم الشاشة
+                hero.y = groundLevel + 5;
+                enemies.forEach(e => e.y = groundLevel + 5);
             }
         }
         window.addEventListener('resize', resizeCanvas);
 
+        // --- تهيئة البيئة ---
+        function initClouds() {
+            clouds = [];
+            for(let i=0; i<5; i++) {
+                clouds.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * (canvas.height/2),
+                    speed: 0.2 + Math.random() * 0.3,
+                    size: 30 + Math.random() * 40
+                });
+            }
+        }
+
+        function drawEnvironment() {
+            // السماء (متدرجة في CSS)
+            
+            // الشمس
+            ctx.fillStyle = '#f1c40f';
+            ctx.shadowBlur = 20; ctx.shadowColor = 'orange';
+            ctx.beginPath(); ctx.arc(canvas.width - 50, 50, 30, 0, Math.PI*2); ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // السحب
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+            clouds.forEach(c => {
+                c.x -= c.speed;
+                if(c.x < -100) c.x = canvas.width + 100;
+                ctx.beginPath();
+                ctx.arc(c.x, c.y, c.size, 0, Math.PI*2);
+                ctx.arc(c.x + c.size*0.5, c.y - c.size*0.5, c.size*0.8, 0, Math.PI*2);
+                ctx.arc(c.x + c.size, c.y, c.size*0.9, 0, Math.PI*2);
+                ctx.fill();
+            });
+
+            // الأرض
+            ctx.fillStyle = '#27ae60';
+            ctx.fillRect(0, groundLevel, canvas.width, canvas.height - groundLevel);
+            // تفاصيل العشب
+            ctx.fillStyle = '#2ecc71';
+            ctx.fillRect(0, groundLevel, canvas.width, 10);
+            
+            // القلعة
+            drawCastle();
+        }
+
         function drawCastle() {
-            const w = canvas.width * 0.25; 
-            const h = canvas.height * 0.4; 
-            const x = 0;
-            const y = groundLevel - h + 20;
+            const w = Math.min(canvas.width * 0.3, 150); // لا تكبر زيادة
+            const h = canvas.height * 0.45;
+            const x = 10;
+            const base = groundLevel;
 
-            ctx.fillStyle = '#7f8c8d'; 
-            ctx.fillRect(x, y + 20, w * 0.3, h - 20);
-            ctx.fillRect(x + w * 0.3, y - 20, w * 0.4, h + 20);
+            // الظل
+            ctx.fillStyle = 'rgba(0,0,0,0.2)';
+            ctx.beginPath(); ctx.ellipse(x + w/2, base, w/2, 10, 0, 0, Math.PI*2); ctx.fill();
+
+            // البرج الرئيسي
+            ctx.fillStyle = '#7f8c8d';
+            ctx.fillRect(x, base - h + 30, w, h - 30);
             
+            // تفاصيل الطوب
             ctx.fillStyle = '#95a5a6';
-            ctx.fillRect(x, y + 10, w * 0.1, 10);
-            ctx.fillRect(x + w * 0.2, y + 10, w * 0.1, 10);
-            ctx.fillRect(x + w * 0.3, y - 30, w * 0.12, 10);
-            ctx.fillRect(x + w * 0.58, y - 30, w * 0.12, 10);
+            for(let i=0; i<5; i++) {
+                ctx.fillRect(x + (Math.random()*w), base - (Math.random()*h), 10, 5);
+            }
 
-            ctx.fillStyle = '#5d4037';
-            ctx.beginPath();
-            ctx.arc(x + w * 0.5, groundLevel + 20, w * 0.15, Math.PI, 0);
-            ctx.fill();
+            // الشرفات
+            ctx.fillStyle = '#34495e';
+            ctx.fillRect(x - 5, base - h + 20, w + 10, 15);
+            for(let i=0; i<4; i++) {
+                ctx.fillRect(x + (i * (w/3.5)), base - h, w/5, 20);
+            }
+
+            // البوابة
+            ctx.fillStyle = '#4e342e';
+            ctx.beginPath(); ctx.arc(x + w/2, base, w/3, Math.PI, 0); ctx.fill();
+            // حديد البوابة
+            ctx.strokeStyle = '#2c3e50'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(x+w/2, base-w/3); ctx.lineTo(x+w/2, base); ctx.stroke();
             
-            ctx.fillStyle = '#c0392b';
-            ctx.beginPath();
-            ctx.moveTo(x + w * 0.5, y - 60);
-            ctx.lineTo(x + w * 0.5, y - 30);
-            ctx.lineTo(x + w * 0.7, y - 45);
-            ctx.fill();
-            ctx.strokeStyle = '#2c3e50';
-            ctx.beginPath();
-            ctx.moveTo(x + w * 0.5, y - 30);
-            ctx.lineTo(x + w * 0.5, y - 20);
-            ctx.stroke();
+            // العلم
+            const flagY = base - h;
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.moveTo(x + w/2, flagY); ctx.lineTo(x + w/2, flagY - 40); ctx.stroke();
+            ctx.fillStyle = '#e74c3c';
+            ctx.beginPath(); ctx.moveTo(x + w/2, flagY - 40); ctx.lineTo(x + w + 20, flagY - 30); ctx.lineTo(x + w/2, flagY - 20); ctx.fill();
+        }
+
+        // --- اللعبة ---
+        function initAudioAndStart() {
+            initAudio(); // تشغيل السياق الصوتي
+            startGame();
         }
 
         function startGame() {
@@ -280,7 +400,10 @@
             enemies = []; particles = [];
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('game-container').classList.remove('hidden');
-            setTimeout(resizeCanvas, 100); 
+            
+            // فرض تحديث الأحجام فوراً
+            resizeCanvas();
+            initClouds();
             updateHUD();
             generateNewQuestion();
             gameLoop(0);
@@ -292,7 +415,7 @@
                 if(el.id.includes('lives')) el.innerText = toArabicNum(lives);
                 if(el.id.includes('coins')) el.innerText = toArabicNum(coins);
             });
-            localStorage.setItem('mathHero_v4', JSON.stringify({ coins, boughtSkins: savedData.boughtSkins, currentSkin: savedData.currentSkin }));
+            localStorage.setItem('mathHero_v5', JSON.stringify({ coins, boughtSkins: savedData.boughtSkins, currentSkin: savedData.currentSkin }));
         }
 
         function generateNewQuestion() {
@@ -337,10 +460,13 @@
             const btns = document.querySelectorAll('.option-btn');
             btns.forEach((b, i) => {
                 b.innerText = toArabicNum(opts[i]);
-                b.setAttribute('data-val', opts[i]); // تخزين القيمة الحقيقية للرقم
+                b.setAttribute('data-val', opts[i]);
                 b.disabled = false;
-                b.style.backgroundColor = 'white';
+                b.style.transform = 'scale(1)';
+                b.style.backgroundColor = '#ecf0f1';
                 b.style.color = 'var(--primary)';
+                b.style.borderColor = 'transparent';
+                b.style.border = 'none';
             });
         }
 
@@ -350,74 +476,109 @@
             return `<div class="visual-representation">${s}</div>`;
         }
 
-        // دالة التحقق المعدلة والمحمية
         function checkAnswer(btn) {
             try {
-                // قراءة القيمة من البيانات المخفية وليس من النص
                 let val = parseInt(btn.getAttribute('data-val'));
-                
                 const allBtns = document.querySelectorAll('.option-btn');
+                
+                // منع النقر المتكرر
+                if(btn.disabled) return;
                 allBtns.forEach(b => b.disabled = true);
                 
                 if(val === currentAnswer) {
-                    btn.style.backgroundColor = '#2ecc71'; // أخضر
+                    btn.style.backgroundColor = '#2ecc71';
                     btn.style.color = 'white';
+                    btn.style.transform = 'scale(1.1)';
+                    playSound('correct');
                     score += 10; coins += 2;
+                    
+                    // إطلاق مقذوف (بصري فقط)
+                    fireProjectile();
+
                     if(enemies.length > 0) { 
-                        createExplosion(enemies[0].x, enemies[0].y); 
-                        enemies.shift(); 
+                        // تأخير الانفجار قليلاً ليتزامن مع المقذوف
+                        setTimeout(() => {
+                            if(enemies[0]) {
+                                createExplosion(enemies[0].x, enemies[0].y); 
+                                enemies.shift();
+                                playSound('explosion');
+                            }
+                        }, 200);
                     }
                     updateHUD();
-                    setTimeout(generateNewQuestion, 300);
+                    setTimeout(generateNewQuestion, 800);
                 } else {
-                    btn.style.backgroundColor = '#e74c3c'; // أحمر
+                    btn.style.backgroundColor = '#e74c3c';
                     btn.style.color = 'white';
+                    playSound('wrong');
                     document.getElementById('controls-area').classList.add('shake');
                     setTimeout(() => {
                         document.getElementById('controls-area').classList.remove('shake');
                         allBtns.forEach(b => { 
                             b.disabled = false; 
-                            b.style.backgroundColor = 'white'; 
+                            b.style.backgroundColor = '#ecf0f1'; 
                             b.style.color = 'var(--primary)'; 
+                            b.style.transform = 'scale(1)';
                         });
                     }, 500);
                 }
             } catch (e) {
-                console.error("Error in checkAnswer:", e);
-                // في حال حدوث خطأ نعيد تفعيل الأزرار فوراً
-                document.querySelectorAll('.option-btn').forEach(b => b.disabled = false);
+                console.error(e);
             }
+        }
+
+        function fireProjectile() {
+            // رسم كرة نار سريعة من البطل
+            let projX = canvas.width * 0.15;
+            let projY = groundLevel - 30;
+            let targetX = enemies.length > 0 ? enemies[0].x : canvas.width;
+            
+            // هنا مجرد تأثير بصري سريع
+            ctx.fillStyle = 'orange';
+            ctx.beginPath(); ctx.arc(projX, projY, 10, 0, Math.PI*2); ctx.fill();
         }
 
         function gameLoop(t) {
             if(gameState !== 'playing') return;
             ctx.clearRect(0,0,canvas.width,canvas.height);
             
-            drawCastle();
+            drawEnvironment();
 
+            // رسم البطل
             ctx.font = `${canvas.height * 0.15}px Cairo`;
+            ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 10;
             ctx.textAlign = 'center';
-            ctx.fillText(hero.sprite, canvas.width * 0.15, groundLevel + 10);
+            ctx.fillText(hero.sprite, canvas.width * 0.15, groundLevel + 5);
+            ctx.shadowBlur = 0;
 
+            // إضافة وحوش (مع التأكد من الموقع الصحيح)
             if(t - lastSpawnTime > spawnInterval) {
                 let baseSpeed = 1.5; 
                 let screenFactor = canvas.width > 800 ? 0.001 : 0.003; 
                 
                 enemies.push({
                     x: canvas.width + 50,
-                    y: groundLevel + 10,
+                    y: groundLevel + 5, // استخدام GroundLevel الحالي دائماً
                     speed: (canvas.width * screenFactor + baseSpeed) * difficulty,
-                    sprite: ['👾','👺','👹','🐉'][Math.floor(Math.random()*4)]
+                    sprite: ['👾','👺','👹','🐉','🦖'][Math.floor(Math.random()*5)],
+                    walkOffset: 0
                 });
                 lastSpawnTime = t;
             }
 
+            // حركة الوحوش
             for(let i=enemies.length-1; i>=0; i--) {
                 let e = enemies[i];
                 e.x -= e.speed;
-                ctx.fillText(e.sprite, e.x, e.y);
+                e.walkOffset += 0.2;
+                let bounce = Math.sin(e.walkOffset) * 5; // حركة المشي
+                
+                ctx.font = `${canvas.height * 0.12}px Cairo`;
+                ctx.fillText(e.sprite, e.x, e.y + bounce);
+                
                 if(e.x < canvas.width * 0.2) {
                     enemies.splice(i,1); lives--; updateHUD();
+                    playSound('wrong');
                     document.getElementById('game-view').classList.add('shake');
                     setTimeout(()=>document.getElementById('game-view').classList.remove('shake'), 400);
                     if(lives <= 0) {
@@ -428,12 +589,13 @@
                 }
             }
 
+            // انفجارات
             for(let i=particles.length-1; i>=0; i--) {
                 let p = particles[i];
-                p.x += p.vx; p.y += p.vy; p.life -= 0.05;
+                p.x += p.vx; p.y += p.vy; p.life -= 0.04;
                 ctx.globalAlpha = p.life;
                 ctx.fillStyle = p.color;
-                ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
                 if(p.life<=0) particles.splice(i,1);
             }
             ctx.globalAlpha = 1;
@@ -442,11 +604,12 @@
         }
 
         function createExplosion(x, y) {
-            for(let i=0; i<20; i++) {
+            for(let i=0; i<25; i++) {
                 particles.push({
-                    x: x, y: y,
-                    vx: (Math.random()-0.5) * 10, vy: (Math.random()-0.5) * 10,
-                    life: 1, color: `hsl(${Math.random()*360}, 100%, 50%)`
+                    x: x, y: y - 20,
+                    vx: (Math.random()-0.5) * 15, vy: (Math.random()-0.5) * 15,
+                    life: 1, size: Math.random()*8+2,
+                    color: `hsl(${Math.random()*60 + 10}, 100%, 50%)` // ألوان نارية
                 });
             }
         }
@@ -459,10 +622,14 @@
                 div.className = `shop-item ${savedData.currentSkin === item.icon ? 'selected' : ''} ${!owned ? 'locked' : ''}`;
                 div.innerHTML = `<div class="shop-icon">${item.icon}</div><div>${owned ? '✔' : toArabicNum(item.price)}</div>`;
                 div.onclick = () => {
-                    if(owned) { savedData.currentSkin = item.icon; hero.sprite = item.icon; renderShop(); updateHUD(); }
+                    if(owned) { 
+                        savedData.currentSkin = item.icon; hero.sprite = item.icon; 
+                        renderShop(); updateHUD(); 
+                    }
                     else if(coins >= item.price) {
                         coins -= item.price; savedData.boughtSkins.push(item.icon);
                         savedData.currentSkin = item.icon; hero.sprite = item.icon;
+                        playSound('correct');
                         renderShop(); updateHUD();
                     }
                 }
