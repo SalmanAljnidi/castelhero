@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>حارس القلعة  | سلمان الجنيدي</title>
+    <title>حارس القلعة الحسابية | سلمان الجنيدي</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#2c3e50">
     <link rel="manifest" id="manifest-placeholder">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3069/3069172.png">
 
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -50,7 +51,7 @@
         
         .credits-box {
             background: rgba(0,0,0,0.4); padding: 15px; border-radius: 15px;
-            margin-bottom: 20px; width: 90%; max-width: 400px;
+            margin-bottom: 10px; width: 90%; max-width: 400px;
             border: 1px solid rgba(255,255,255,0.1);
             backdrop-filter: blur(5px);
         }
@@ -66,16 +67,23 @@
 
         .btn {
             background: linear-gradient(to bottom, #2ecc71, #27ae60); color: white; border: none;
-            padding: 12px 40px; font-size: 1.3rem; border-radius: 50px;
-            margin: 10px; cursor: pointer; font-family: 'Cairo', sans-serif;
+            padding: 12px 20px; font-size: 1.2rem; border-radius: 50px;
+            margin: 8px; cursor: pointer; font-family: 'Cairo', sans-serif;
             box-shadow: 0 5px 0 #1e8449, 0 10px 10px rgba(0,0,0,0.2); 
             transition: all 0.1s; width: 90%; max-width: 350px; font-weight: bold;
         }
         .btn:active { transform: translateY(5px); box-shadow: none; }
         .btn-blue { background: linear-gradient(to bottom, #3498db, #2980b9); box-shadow: 0 5px 0 #20638f; }
         .btn-gold { background: linear-gradient(to bottom, #f1c40f, #f39c12); color: var(--primary); box-shadow: 0 5px 0 #d35400; }
+        
+        /* زر التثبيت */
+        .btn-install { 
+            background: linear-gradient(to bottom, #9b59b6, #8e44ad); 
+            box-shadow: 0 5px 0 #6c3483;
+            font-size: 1rem; padding: 10px 20px; width: auto;
+        }
 
-        .mode-select { display: flex; gap: 10px; margin-bottom: 20px; width: 90%; max-width: 400px; }
+        .mode-select { display: flex; gap: 10px; margin-bottom: 10px; width: 90%; max-width: 400px; }
         .mode-btn { flex: 1; padding: 12px; opacity: 0.7; transition: 0.3s; border: 2px solid rgba(255,255,255,0.2); font-size: 1rem; color: white; background: rgba(0,0,0,0.2); border-radius: 12px; cursor: pointer; font-family: 'Cairo', sans-serif;}
         .mode-btn.active { opacity: 1; border-color: var(--gold); background: rgba(241, 196, 15, 0.2); transform: scale(1.05); font-weight: bold; }
 
@@ -165,7 +173,7 @@
 <body>
 
     <div id="start-screen" class="screen">
-        <h1>حارس القلعة  </h1>
+        <h1>حارس القلعة الحسابية</h1>
         <div class="credits-box">
             <div class="credits-name">فكرة وتصميم: أ. سلمان الجنيدي</div>
             <div class="social-icons">
@@ -173,7 +181,12 @@
                 <a href="https://snapchat.com/t/2tVDWcXq" target="_blank"><i class="fab fa-snapchat"></i></a>
             </div>
         </div>
-        <p style="margin: 0 0 10px 0; color: #ecf0f1;">اختر المرحلة الدراسية:</p>
+        
+        <button id="install-btn" class="btn btn-install hidden" onclick="installApp()">
+            <i class="fas fa-download"></i> تثبيت اللعبة كتطبيق
+        </button>
+
+        <p style="margin: 10px 0 5px 0; color: #ecf0f1;">اختر المرحلة الدراسية:</p>
         <div class="mode-select">
             <button id="mode-lower" class="mode-btn active" onclick="setMode('lower')">الصفوف الأولية</button>
             <button id="mode-upper" class="mode-btn" onclick="setMode('upper')">الصفوف العليا</button>
@@ -190,7 +203,7 @@
     </div>
 
     <div id="game-over-screen" class="screen hidden">
-        <h1 style="color: var(--accent-wrong);">حظا أوفر</h1>
+        <h1 style="color: var(--accent-wrong);">سقطت القلعة!</h1>
         <p style="font-size: 1.5rem;">جمعت: <span class="arabic-num" id="final-score">٠</span> نقطة</p>
         <button class="btn" onclick="resetGame()">لعب مرة أخرى</button>
         <button class="btn btn-blue" onclick="location.reload()">القائمة الرئيسية</button>
@@ -220,6 +233,8 @@
     </div>
 
     <script>
+        // --- إعداد التثبيت ---
+        // تعريف بيانات التطبيق للمتصفح
         const manifestData = {
             "name": "حارس القلعة", "short_name": "القلعة", "start_url": ".",
             "display": "standalone", "background_color": "#2c3e50", "theme_color": "#2c3e50",
@@ -229,6 +244,42 @@
         const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
         document.getElementById('manifest-placeholder').href = URL.createObjectURL(blob);
 
+        // منطق زر التثبيت
+        let deferredPrompt;
+        const installBtn = document.getElementById('install-btn');
+
+        // للأندرويد والكمبيوتر
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.classList.remove('hidden'); // إظهار الزر
+        });
+
+        // إظهار الزر دائماً في الآيفون/الآيباد مع تعليمات مختلفة
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if(isIOS && !window.navigator.standalone) {
+            installBtn.classList.remove('hidden');
+        }
+
+        function installApp() {
+            if (deferredPrompt) {
+                // للأندرويد
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        installBtn.classList.add('hidden');
+                    }
+                    deferredPrompt = null;
+                });
+            } else if (isIOS) {
+                // للآيفون
+                alert("لتثبيت اللعبة على الآيفون:\n1. اضغط على زر المشاركة (سهم للأعلى) في أسفل المتصفح.\n2. اختر 'إضافة إلى الشاشة الرئيسية' (Add to Home Screen).");
+            } else {
+                alert("لتثبيت اللعبة، اضغط على خيارات المتصفح واختر 'تثبيت التطبيق' أو 'Add to Home Screen'.");
+            }
+        }
+
+        // --- باقي كود اللعبة ---
         let audioCtx;
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -257,19 +308,16 @@
         let gameState = 'start';
         let difficulty = 1;
         
-        // تم تغيير مفتاح الحفظ إلى v11 لفرض تحديث الشخصيات
-        // تم تغيير الشخصية الافتراضية إلى الأمير
         let savedData = JSON.parse(localStorage.getItem('mathHero_v11')) || { coins: 0, boughtSkins: ['🤴'], currentSkin: '🤴' };
         coins = savedData.coins;
 
-        // قائمة شخصيات رجالية واضحة
         const shopItems = [
-            { icon: '🤴', price: 0 },   // أمير (الافتراضي)
-            { icon: '🦸‍♂️', price: 50 },  // بطل خارق
-            { icon: '🥷', price: 100 }, // نينجا
-            { icon: '🧙‍♂️', price: 200 }, // ساحر
-            { icon: '🤖', price: 300 }, // روبوت
-            { icon: '🧔', price: 500 }  // رجل بلحية
+            { icon: '🤴', price: 0 }, 
+            { icon: '🦸‍♂️', price: 50 }, 
+            { icon: '🥷', price: 100 }, 
+            { icon: '🧙‍♂️', price: 200 }, 
+            { icon: '🤖', price: 300 }, 
+            { icon: '🧔', price: 500 }
         ];
 
         let hero = { x: 50, y: 0, sprite: savedData.currentSkin };
