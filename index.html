@@ -3,76 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>حارس القلعة</title>
+    <title>حارس القلعة الحسابية | سلمان الجنيدي</title>
     
-    <link rel="manifest" href="manifest.json">
-    
-    <meta name="theme-color" content="#2c3e50">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="manifest" id="manifest-placeholder">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3069/3069172.png">
 
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root { --primary: #2c3e50; --secondary: #34495e; --accent-correct: #2ecc71; --accent-wrong: #e74c3c; --gold: #f1c40f; }
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent-correct: #2ecc71;
+            --accent-wrong: #e74c3c;
+            --gold: #f1c40f;
+            --bg-sky-top: #3498db;
+            --bg-sky-bot: #87CEEB;
+        }
+
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; padding: 0; font-family: 'Cairo', sans-serif; background-color: var(--primary); height: 100vh; height: 100dvh; overflow: hidden; touch-action: manipulation; user-select: none; }
-        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; color: white; text-align: center; padding: 20px; }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--primary);
+            height: 100vh; height: 100dvh;
+            overflow: hidden; touch-action: manipulation; user-select: none;
+        }
+
+        .screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 100; color: white; text-align: center; padding: 20px;
+        }
         .hidden { display: none !important; }
-        h1 { font-size: 2rem; margin: 0 0 10px 0; color: var(--gold); text-shadow: 3px 3px 0 rgba(0,0,0,0.5); font-weight: 800; }
-        .credits-box { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 15px; margin-bottom: 20px; width: 90%; max-width: 400px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(5px); }
-        .social-icons { display: flex; justify-content: center; gap: 25px; margin-top: 10px; }
-        .social-icons a { color: white; font-size: 2.2rem; text-decoration: none; transition: transform 0.2s; }
-        .btn { background: linear-gradient(to bottom, #2ecc71, #27ae60); color: white; border: none; padding: 12px 30px; font-size: 1.2rem; border-radius: 50px; margin: 8px; cursor: pointer; font-family: 'Cairo', sans-serif; box-shadow: 0 5px 0 #1e8449; transition: all 0.1s; width: 90%; max-width: 350px; font-weight: bold; }
+
+        /* العنوان الرئيسي */
+        h1 {
+            font-size: 2.2rem; margin: 0 0 20px 0; color: var(--gold);
+            text-shadow: 3px 3px 0 rgba(0,0,0,0.5); font-weight: 800;
+        }
+
+        /* الأزرار */
+        .btn {
+            background: linear-gradient(to bottom, #2ecc71, #27ae60); color: white; border: none;
+            padding: 12px 30px; font-size: 1.3rem; border-radius: 50px;
+            margin: 10px; cursor: pointer; font-family: 'Cairo', sans-serif;
+            box-shadow: 0 5px 0 #1e8449, 0 10px 10px rgba(0,0,0,0.2); 
+            transition: all 0.1s; width: 85%; max-width: 350px; font-weight: bold;
+        }
         .btn:active { transform: translateY(5px); box-shadow: none; }
+        .btn-blue { background: linear-gradient(to bottom, #3498db, #2980b9); box-shadow: 0 5px 0 #20638f; }
         .btn-gold { background: linear-gradient(to bottom, #f1c40f, #f39c12); color: var(--primary); box-shadow: 0 5px 0 #d35400; }
+        
+        /* زر التثبيت */
+        .btn-install {
+            background: #9b59b6; box-shadow: 0 5px 0 #8e44ad; font-size: 1rem; width: auto; padding: 10px 20px;
+            margin-top: 5px;
+        }
+
         .mode-select { display: flex; gap: 10px; margin-bottom: 20px; width: 90%; max-width: 400px; }
-        .mode-btn { flex: 1; padding: 12px; opacity: 0.7; border: 2px solid rgba(255,255,255,0.2); font-size: 1rem; color: white; background: rgba(0,0,0,0.2); border-radius: 12px; cursor: pointer; font-family: 'Cairo'; }
+        .mode-btn { flex: 1; padding: 12px; opacity: 0.7; transition: 0.3s; border: 2px solid rgba(255,255,255,0.2); font-size: 1rem; color: white; background: rgba(0,0,0,0.2); border-radius: 12px; cursor: pointer; font-family: 'Cairo', sans-serif;}
         .mode-btn.active { opacity: 1; border-color: var(--gold); background: rgba(241, 196, 15, 0.2); transform: scale(1.05); font-weight: bold; }
+
+        /* منطقة الحقوق في الأسفل (تم التعديل) */
+        .footer-credits {
+            position: absolute; bottom: 20px; left: 0; right: 0;
+            text-align: center; color: rgba(255,255,255,0.8);
+        }
+        .credits-name { font-size: 1rem; margin-bottom: 10px; font-weight: bold; }
+        .social-icons { display: flex; justify-content: center; gap: 25px; }
+        .social-icons a {
+            color: white; font-size: 2rem; text-decoration: none;
+            transition: transform 0.2s; display: inline-block;
+        }
+        .social-icons a:hover { transform: scale(1.2); }
+        .fa-whatsapp { color: #25D366; }
+        .fa-snapchat { color: #FFFC00; text-shadow: 0 0 5px #000; }
+
+        /* اللعبة */
         #game-container { display: flex; flex-direction: column; height: 100%; }
-        #game-view { flex: 1; position: relative; background: linear-gradient(to bottom, #3498db, #87CEEB); overflow: hidden; }
+        
+        #game-view {
+            flex: 1; position: relative;
+            background: linear-gradient(to bottom, var(--bg-sky-top), var(--bg-sky-bot));
+            overflow: hidden;
+            box-shadow: inset 0 -10px 20px rgba(0,0,0,0.1);
+        }
+
         canvas { width: 100%; height: 100%; display: block; }
-        #hud { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; justify-content: space-between; font-size: 1.2rem; color: white; pointer-events: none; z-index: 20; }
-        #controls-area { height: auto; min-height: 35vh; background: var(--secondary); padding: 15px 20px calc(20px + env(safe-area-inset-bottom)) 20px; display: flex; flex-direction: column; gap: 15px; border-top: 6px solid var(--primary); z-index: 10; }
-        #question-box { background: #fff; color: var(--primary); padding: 10px; border-radius: 15px; text-align: center; font-size: 2rem; font-weight: 800; min-height: 80px; display: flex; flex-direction: column; justify-content: center; }
+
+        #hud {
+            position: absolute; top: 10px; left: 10px; right: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 1.2rem; color: white; text-shadow: 2px 2px 0 #000;
+            pointer-events: none; z-index: 20;
+        }
+        .hud-group { display: flex; gap: 15px; background: rgba(0,0,0,0.4); padding: 5px 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); }
+
+        #controls-area {
+            height: auto; min-height: 35vh;
+            background: var(--secondary);
+            padding: 15px 20px calc(20px + env(safe-area-inset-bottom)) 20px;
+            display: flex; flex-direction: column; gap: 15px;
+            border-top: 6px solid var(--primary); 
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5); z-index: 10;
+        }
+
+        #question-box {
+            background: #fff; color: var(--primary); padding: 10px; border-radius: 15px;
+            text-align: center; font-size: 2rem; font-weight: 800;
+            box-shadow: 0 4px 0 #bdc3c7;
+            min-height: 80px; display: flex; flex-direction: column; justify-content: center;
+        }
         .visual-representation { display: flex; justify-content: center; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
-        .dot { width: 16px; height: 16px; background: var(--accent-wrong); border-radius: 50%; display: inline-block; box-shadow: inset -2px -2px rgba(0,0,0,0.2); border: 1px solid rgba(0,0,0,0.1); position: relative; }
-        .dot.crossed { background: #bdc3c7; opacity: 0.6; }
-        .dot.crossed::after, .dot.crossed::before { content: ''; position: absolute; top: 50%; left: 50%; width: 100%; height: 3px; background: #c0392b; }
-        .dot.crossed::after { transform: translate(-50%, -50%) rotate(45deg); }
-        .dot.crossed::before { transform: translate(-50%, -50%) rotate(-45deg); }
+        
+        .dot { 
+            width: 16px; height: 16px; 
+            background: var(--accent-wrong); 
+            border-radius: 50%; display: inline-block; 
+            box-shadow: inset -2px -2px rgba(0,0,0,0.2); 
+            border: 1px solid rgba(0,0,0,0.1); 
+            position: relative;
+        }
+        
+        .dot.crossed {
+            background: #bdc3c7; opacity: 0.6;
+        }
+        .dot.crossed::after { content: ''; position: absolute; top: 50%; left: 50%; width: 100%; height: 3px; background: #c0392b; transform: translate(-50%, -50%) rotate(45deg); }
+        .dot.crossed::before { content: ''; position: absolute; top: 50%; left: 50%; width: 100%; height: 3px; background: #c0392b; transform: translate(-50%, -50%) rotate(-45deg); }
+
         #options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; height: 90px; }
-        .option-btn { background: #ecf0f1; color: var(--primary); border: none; font-size: 1.8rem; font-weight: bold; border-radius: 15px; cursor: pointer; box-shadow: 0 6px 0 #bdc3c7; font-family: 'Cairo'; height: 100%; }
+        .option-btn {
+            background: #ecf0f1; color: var(--primary); border: none;
+            font-size: 1.8rem; font-weight: bold; border-radius: 15px; cursor: pointer;
+            box-shadow: 0 6px 0 #bdc3c7; transition: transform 0.1s; font-family: 'Cairo', sans-serif; height: 100%;
+        }
         .option-btn:active { transform: translateY(6px); box-shadow: none; }
+        
         .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
-        @keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-6px, 0, 0); } 40%, 60% { transform: translate3d(6px, 0, 0); } }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
         .shop-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; width: 100%; max-width: 400px; }
-        .shop-item { background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; border: 2px solid transparent; cursor: pointer; position: relative; }
-        .shop-item.selected { border-color: var(--gold); background: rgba(241, 196, 15, 0.2); }
+        .shop-item {
+            background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px;
+            border: 2px solid transparent; cursor: pointer; position: relative; transition: 0.2s;
+        }
+        .shop-item:active { transform: scale(0.95); }
+        .shop-item.selected { border-color: var(--gold); background: rgba(241, 196, 15, 0.2); box-shadow: 0 0 15px rgba(241, 196, 15, 0.3); }
         .shop-item.locked { opacity: 0.5; filter: grayscale(1); }
-        .shop-icon { font-size: 2.5rem; }
+        .shop-icon { font-size: 2.5rem; filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.3)); }
     </style>
 </head>
 <body>
 
     <div id="start-screen" class="screen">
-        <h1>حارس القلعة الحسابية</h1>
-        <div class="credits-box">
-            <div style="font-weight:bold; margin-bottom:5px">فكرة وتصميم: أ. سلمان الجنيدي</div>
+        <h1 style="margin-top: 50px;">حارس القلعة الحسابية</h1>
+        
+        <p style="margin: 0 0 10px 0; color: #ecf0f1;">اختر المرحلة الدراسية:</p>
+        <div class="mode-select">
+            <button id="mode-lower" class="mode-btn active" onclick="setMode('lower')">الصفوف الأولية</button>
+            <button id="mode-upper" class="mode-btn" onclick="setMode('upper')">الصفوف العليا</button>
+        </div>
+        
+        <button class="btn" onclick="initAudioAndStart()">ابدأ التحدي! ⚔️</button>
+        <button class="btn btn-gold" onclick="showShop()">المتجر 🛒</button>
+        
+        <button id="install-btn" class="btn btn-install" onclick="installApp()" style="display:none">
+            <i class="fas fa-download"></i> تثبيت التطبيق
+        </button>
+
+        <div class="footer-credits">
+            <div class="credits-name">فكرة وتصميم: أ. سلمان الجنيدي</div>
             <div class="social-icons">
                 <a href="https://wa.me/966566996166" target="_blank"><i class="fab fa-whatsapp"></i></a>
                 <a href="https://snapchat.com/t/2tVDWcXq" target="_blank"><i class="fab fa-snapchat"></i></a>
             </div>
         </div>
-        <p style="margin: 0 0 10px 0;">اختر المرحلة الدراسية:</p>
-        <div class="mode-select">
-            <button id="mode-lower" class="mode-btn active" onclick="setMode('lower')">الصفوف الأولية</button>
-            <button id="mode-upper" class="mode-btn" onclick="setMode('upper')">الصفوف العليا</button>
-        </div>
-        <button class="btn" onclick="initAudioAndStart()">ابدأ التحدي! ⚔️</button>
-        <button class="btn btn-gold" onclick="showShop()">المتجر 🛒</button>
     </div>
 
     <div id="shop-screen" class="screen hidden">
@@ -93,12 +211,17 @@
         <div id="game-view">
             <canvas id="game-canvas"></canvas>
             <div id="hud">
-                <div><i class="fas fa-heart" style="color:#e74c3c"></i> <span class="arabic-num" id="lives-disp">٣</span></div>
-                <div><i class="fas fa-star" style="color:var(--gold)"></i> <span class="arabic-num" id="score-disp">٠</span></div>
+                <div class="hud-group">
+                    <div><i class="fas fa-heart" style="color:#e74c3c"></i> <span class="arabic-num" id="lives-disp">٣</span></div>
+                    <div><i class="fas fa-star" style="color:var(--gold)"></i> <span class="arabic-num" id="score-disp">٠</span></div>
+                </div>
             </div>
         </div>
         <div id="controls-area">
-            <div id="question-box"><div id="q-text">...</div><div id="q-visual"></div></div>
+            <div id="question-box">
+                <div id="q-text">...</div>
+                <div id="q-visual"></div>
+            </div>
             <div id="options-grid">
                 <button class="option-btn arabic-num" onclick="checkAnswer(this)"></button>
                 <button class="option-btn arabic-num" onclick="checkAnswer(this)"></button>
@@ -108,129 +231,408 @@
     </div>
 
     <script>
-        // --- تسجيل Service Worker (للتثبيت) ---
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js')
-                    .then(reg => console.log('Service Worker Registered'))
-                    .catch(err => console.log('Service Worker Failed', err));
+        // إعدادات التثبيت (Blob Trick)
+        const manifestData = {
+            "name": "حارس القلعة", "short_name": "القلعة", "start_url": ".",
+            "display": "standalone", "background_color": "#2c3e50", "theme_color": "#2c3e50",
+            "orientation": "portrait",
+            "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/3069/3069172.png", "sizes": "192x192", "type": "image/png"}]
+        };
+        const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
+        document.getElementById('manifest-placeholder').href = URL.createObjectURL(blob);
+
+        // منطق زر التثبيت
+        let deferredPrompt;
+        const installBtn = document.getElementById('install-btn');
+        
+        // إظهار الزر إذا كان المتصفح يدعم التثبيت
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
+        });
+
+        // إظهار الزر دائماً في الآيفون (تعليمات)
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if(isIOS && !window.navigator.standalone) {
+            installBtn.style.display = 'block';
+        }
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') installBtn.style.display = 'none';
+                    deferredPrompt = null;
+                });
+            } else if (isIOS) {
+                alert("لتثبيت اللعبة على الآيفون:\nاضغط على زر المشاركة في الأسفل، ثم اختر 'إضافة إلى الصفحة الرئيسية'.");
+            } else {
+                alert("لتثبيت اللعبة، اضغط على خيارات المتصفح (الثلاث نقاط) واختر 'تثبيت التطبيق'.");
+            }
+        }
+
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            if (type === 'correct') { 
+                osc.type = 'sine'; osc.frequency.setValueAtTime(500, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.1); gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'wrong') { 
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime); osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.2); gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        let gameMode = 'lower';
+        let score = 0, lives = 3, coins = 0;
+        let currentAnswer = 0;
+        let gameState = 'start';
+        let difficulty = 1;
+        
+        let savedData = JSON.parse(localStorage.getItem('mathHero_v11')) || { coins: 0, boughtSkins: ['🤴'], currentSkin: '🤴' };
+        coins = savedData.coins;
+
+        const shopItems = [
+            { icon: '🤴', price: 0 }, { icon: '🦸‍♂️', price: 50 },
+            { icon: '🥷', price: 100 }, { icon: '🦁', price: 200 },
+            { icon: '🤖', price: 300 }, { icon: '🧔', price: 500 }
+        ];
+
+        let hero = { x: 50, y: 0, sprite: savedData.currentSkin };
+        let enemies = [];
+        let particles = [];
+        let clouds = [];
+        let groundLevel = 0;
+        let castleX = 0;
+
+        function toArabicNum(num) {
+            return num.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+        }
+
+        function resizeCanvas() {
+            const container = document.getElementById('game-view');
+            if(container) {
+                canvas.width = container.clientWidth;
+                canvas.height = container.clientHeight;
+                groundLevel = canvas.height * 0.75;
+                hero.y = groundLevel + 5;
+                castleX = canvas.width * 0.25;
+                enemies.forEach(e => e.y = groundLevel + 5);
+            }
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        function initClouds() {
+            clouds = [];
+            for(let i=0; i<5; i++) {
+                clouds.push({
+                    x: Math.random() * canvas.width, y: Math.random() * (canvas.height/2),
+                    speed: 0.1 + Math.random() * 0.2, size: 30 + Math.random() * 40
+                });
+            }
+        }
+
+        function drawEnvironment() {
+            ctx.fillStyle = '#f1c40f';
+            ctx.shadowBlur = 20; ctx.shadowColor = 'orange';
+            ctx.beginPath(); ctx.arc(canvas.width - 50, 50, 30, 0, Math.PI*2); ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+            clouds.forEach(c => {
+                c.x -= c.speed;
+                if(c.x < -100) c.x = canvas.width + 100;
+                ctx.beginPath();
+                ctx.arc(c.x, c.y, c.size, 0, Math.PI*2);
+                ctx.arc(c.x + c.size*0.5, c.y - c.size*0.5, c.size*0.8, 0, Math.PI*2);
+                ctx.arc(c.x + c.size, c.y, c.size*0.9, 0, Math.PI*2);
+                ctx.fill();
+            });
+
+            ctx.fillStyle = '#27ae60'; ctx.fillRect(0, groundLevel, canvas.width, canvas.height - groundLevel);
+            ctx.fillStyle = '#2ecc71'; ctx.fillRect(0, groundLevel, canvas.width, 10);
+            
+            ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 4; ctx.setLineDash([10, 5]);
+            ctx.beginPath(); ctx.moveTo(castleX + 30, groundLevel); ctx.lineTo(castleX + 30, groundLevel - 150); ctx.stroke();
+            ctx.setLineDash([]);
+
+            drawCastle();
+        }
+
+        function drawCastle() {
+            const w = Math.min(canvas.width * 0.25, 120);
+            const h = canvas.height * 0.45;
+            const x = 10;
+            const base = groundLevel;
+
+            ctx.fillStyle = 'rgba(0,0,0,0.2)';
+            ctx.beginPath(); ctx.ellipse(x + w/2, base, w/2, 10, 0, 0, Math.PI*2); ctx.fill();
+
+            ctx.fillStyle = '#7f8c8d'; ctx.fillRect(x, base - h + 30, w, h - 30);
+            ctx.fillStyle = '#34495e';
+            ctx.fillRect(x - 5, base - h + 20, w + 10, 15);
+            ctx.fillStyle = '#4e342e';
+            ctx.beginPath(); ctx.arc(x + w/2, base, w/3, Math.PI, 0); ctx.fill();
+            
+            const flagY = base - h;
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.moveTo(x + w/2, flagY); ctx.lineTo(x + w/2, flagY - 40); ctx.stroke();
+            ctx.fillStyle = '#e74c3c';
+            ctx.beginPath(); ctx.moveTo(x + w/2, flagY - 40); ctx.lineTo(x + w + 20, flagY - 30); ctx.lineTo(x + w/2, flagY - 20); ctx.fill();
+        }
+
+        function initAudioAndStart() {
+            initAudio(); startGame();
+        }
+
+        function startGame() {
+            gameState = 'playing';
+            score = 0; lives = 3; difficulty = 1;
+            enemies = []; particles = [];
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-container').classList.remove('hidden');
+            resizeCanvas(); initClouds(); updateHUD(); generateNewQuestion(); gameLoop(0);
+        }
+
+        function updateHUD() {
+            document.querySelectorAll('.arabic-num').forEach(el => {
+                if(el.id.includes('score')) el.innerText = toArabicNum(score);
+                if(el.id.includes('lives')) el.innerText = toArabicNum(lives);
+                if(el.id.includes('coins')) el.innerText = toArabicNum(coins);
+            });
+            localStorage.setItem('mathHero_v11', JSON.stringify({ coins, boughtSkins: savedData.boughtSkins, currentSkin: savedData.currentSkin }));
+        }
+
+        function generateNewQuestion() {
+            let n1, n2, op, vis = '';
+            if (gameMode === 'lower') {
+                if (Math.random() > 0.5) {
+                    n1 = Math.floor(Math.random() * 6); n2 = Math.floor(Math.random() * (11 - n1));
+                    currentAnswer = n1 + n2;
+                    document.getElementById('q-text').innerText = `${toArabicNum(n1)} + ${toArabicNum(n2)} = ؟`;
+                    vis = drawDots(n1, false) + '<span style="font-size:1.5rem">+</span>' + drawDots(n2, false);
+                } else {
+                    n1 = Math.floor(Math.random() * 11); 
+                    n2 = Math.floor(Math.random() * (n1 + 1));
+                    currentAnswer = n1 - n2;
+                    document.getElementById('q-text').innerText = `${toArabicNum(n1)} − ${toArabicNum(n2)} = ؟`;
+                    vis = drawSubtractionVisual(n1, n2);
+                }
+            } else {
+                if (Math.random() > 0.5) {
+                    n1 = Math.floor(Math.random() * 11); n2 = Math.floor(Math.random() * 11);
+                    currentAnswer = n1 * n2;
+                    document.getElementById('q-text').innerText = `${toArabicNum(n1)} × ${toArabicNum(n2)} = ؟`;
+                } else {
+                    n2 = Math.floor(Math.random() * 9) + 1; currentAnswer = Math.floor(Math.random() * 11); n1 = n2 * currentAnswer;
+                    document.getElementById('q-text').innerText = `${toArabicNum(n1)} ÷ ${toArabicNum(n2)} = ؟`;
+                }
+            }
+            document.getElementById('q-visual').innerHTML = vis;
+            
+            let opts = [currentAnswer];
+            while(opts.length < 3) {
+                let r = currentAnswer + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random()*5)+1);
+                if(r >= 0 && !opts.includes(r)) opts.push(r);
+            }
+            opts.sort(() => Math.random() - 0.5);
+            
+            const btns = document.querySelectorAll('.option-btn');
+            btns.forEach((b, i) => {
+                b.innerText = toArabicNum(opts[i]);
+                b.setAttribute('data-val', opts[i]);
+                b.disabled = false;
+                b.style.transform = 'scale(1)';
+                b.style.backgroundColor = '#ecf0f1';
+                b.style.color = 'var(--primary)';
             });
         }
 
-        // --- منطق اللعبة (نفس المنطق المعتمد: وحش واحد، 15 ثانية، طرح بالدوائر) ---
-        let audioCtx;
-        function initAudio() { if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==='suspended') audioCtx.resume(); }
-        function playSound(t) { if(!audioCtx)return; const o=audioCtx.createOscillator(),g=audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); if(t==='correct'){o.type='sine';o.frequency.setValueAtTime(500,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(1000,audioCtx.currentTime+0.1);g.gain.setValueAtTime(0.3,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.3);o.start();o.stop(audioCtx.currentTime+0.3);}else{o.type='sawtooth';o.frequency.setValueAtTime(150,audioCtx.currentTime);g.gain.setValueAtTime(0.3,audioCtx.currentTime);g.gain.linearRampToValueAtTime(0.01,audioCtx.currentTime+0.3);o.start();o.stop(audioCtx.currentTime+0.3);} }
-
-        const canvas = document.getElementById('game-canvas'), ctx = canvas.getContext('2d');
-        let gameMode='lower', score=0, lives=3, coins=0, currentAnswer=0, gameState='start', difficulty=1;
-        let savedData = JSON.parse(localStorage.getItem('mathHero_v12')) || {coins:0, boughtSkins:['🤴'], currentSkin:'🤴'};
-        coins=savedData.coins;
-        const shopItems = [{icon:'🤴',price:0},{icon:'🦸‍♂️',price:50},{icon:'🥷',price:100},{icon:'🧙‍♂️',price:200},{icon:'🤖',price:300},{icon:'🧔',price:500}];
-        let hero={x:50,y:0,sprite:savedData.currentSkin}, enemies=[], particles=[], clouds=[], groundLevel=0, castleX=0;
-
-        function toArabicNum(n){return n.toString().replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);}
-        function resizeCanvas(){ const c=document.getElementById('game-view'); if(c){canvas.width=c.clientWidth; canvas.height=c.clientHeight; groundLevel=canvas.height*0.75; hero.y=groundLevel+5; castleX=canvas.width*0.25; enemies.forEach(e=>e.y=groundLevel+5);} }
-        window.addEventListener('resize', resizeCanvas);
-
-        function initClouds(){clouds=[];for(let i=0;i<5;i++)clouds.push({x:Math.random()*canvas.width,y:Math.random()*(canvas.height/2),speed:0.1+Math.random()*0.2,size:30+Math.random()*40});}
-        function drawEnvironment(){
-            ctx.fillStyle='#f1c40f'; ctx.beginPath();ctx.arc(canvas.width-50,50,30,0,Math.PI*2);ctx.fill();
-            ctx.fillStyle='rgba(255,255,255,0.7)'; clouds.forEach(c=>{c.x-=c.speed;if(c.x<-100)c.x=canvas.width+100;ctx.beginPath();ctx.arc(c.x,c.y,c.size,0,Math.PI*2);ctx.arc(c.x+c.size*0.5,c.y-c.size*0.5,c.size*0.8,0,Math.PI*2);ctx.fill();});
-            ctx.fillStyle='#27ae60';ctx.fillRect(0,groundLevel,canvas.width,canvas.height-groundLevel);
-            ctx.strokeStyle='#bdc3c7';ctx.lineWidth=4;ctx.setLineDash([10,5]);ctx.beginPath();ctx.moveTo(castleX+30,groundLevel);ctx.lineTo(castleX+30,groundLevel-150);ctx.stroke();ctx.setLineDash([]);
-            drawCastle();
-        }
-        function drawCastle(){
-            const w=Math.min(canvas.width*0.25,120), h=canvas.height*0.45, x=10, base=groundLevel;
-            ctx.fillStyle='rgba(0,0,0,0.2)';ctx.beginPath();ctx.ellipse(x+w/2,base,w/2,10,0,0,Math.PI*2);ctx.fill();
-            ctx.fillStyle='#7f8c8d';ctx.fillRect(x,base-h+30,w,h-30);
-            ctx.fillStyle='#34495e';ctx.fillRect(x-5,base-h+20,w+10,15);
-            ctx.fillStyle='#4e342e';ctx.beginPath();ctx.arc(x+w/2,base,w/3,Math.PI,0);ctx.fill();
-            ctx.strokeStyle='#fff';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x+w/2,base-h);ctx.lineTo(x+w/2,base-h-40);ctx.stroke();
-            ctx.fillStyle='#e74c3c';ctx.beginPath();ctx.moveTo(x+w/2,base-h-40);ctx.lineTo(x+w+20,base-h-30);ctx.lineTo(x+w/2,base-h-20);ctx.fill();
-        }
-
-        function initAudioAndStart(){ initAudio(); startGame(); }
-        function startGame(){ gameState='playing'; score=0; lives=3; difficulty=1; enemies=[]; particles=[]; document.getElementById('start-screen').classList.add('hidden'); document.getElementById('game-container').classList.remove('hidden'); resizeCanvas(); initClouds(); updateHUD(); generateNewQuestion(); gameLoop(0); }
-        
-        function updateHUD(){ 
-            document.getElementById('lives-disp').innerText=toArabicNum(lives); 
-            document.getElementById('score-disp').innerText=toArabicNum(score);
-            document.getElementById('shop-coins-disp').innerText=toArabicNum(coins);
-            document.getElementById('final-score').innerText=toArabicNum(score);
-            localStorage.setItem('mathHero_v12',JSON.stringify({coins,boughtSkins:savedData.boughtSkins,currentSkin:savedData.currentSkin}));
-        }
-
-        function generateNewQuestion(){
-            let n1,n2,vis='';
-            if(gameMode==='lower'){
-                if(Math.random()>0.5){ n1=Math.floor(Math.random()*6); n2=Math.floor(Math.random()*(11-n1)); currentAnswer=n1+n2; document.getElementById('q-text').innerText=`${toArabicNum(n1)} + ${toArabicNum(n2)} = ؟`; vis=drawDots(n1)+'<span style="font-size:1.5rem">+</span>'+drawDots(n2); }
-                else { n1=Math.floor(Math.random()*11); n2=Math.floor(Math.random()*(n1+1)); currentAnswer=n1-n2; document.getElementById('q-text').innerText=`${toArabicNum(n1)} − ${toArabicNum(n2)} = ؟`; vis=drawSub(n1,n2); }
-            } else {
-                if(Math.random()>0.5){ n1=Math.floor(Math.random()*11); n2=Math.floor(Math.random()*11); currentAnswer=n1*n2; document.getElementById('q-text').innerText=`${toArabicNum(n1)} × ${toArabicNum(n2)} = ؟`; }
-                else { n2=Math.floor(Math.random()*9)+1; currentAnswer=Math.floor(Math.random()*11); n1=n2*currentAnswer; document.getElementById('q-text').innerText=`${toArabicNum(n1)} ÷ ${toArabicNum(n2)} = ؟`; }
+        function drawDots(n, crossed = false) {
+            if(gameMode === 'upper') return '';
+            let s = ''; 
+            for(let i=0;i<n;i++) {
+                s += `<span class="dot ${crossed ? 'crossed' : ''}"></span>`;
             }
-            document.getElementById('q-visual').innerHTML=vis;
-            let opts=[currentAnswer]; while(opts.length<3){let r=currentAnswer+(Math.random()>0.5?1:-1)*(Math.floor(Math.random()*5)+1); if(r>=0&&!opts.includes(r))opts.push(r);} opts.sort(()=>Math.random()-0.5);
-            document.querySelectorAll('.option-btn').forEach((b,i)=>{ b.innerText=toArabicNum(opts[i]); b.setAttribute('data-val',opts[i]); b.disabled=false; b.style.backgroundColor='#ecf0f1'; b.style.color='var(--primary)'; b.style.transform='scale(1)'; });
-        }
-        function drawDots(n){if(gameMode==='upper')return'';let s='';for(let i=0;i<n;i++)s+='<span class="dot"></span>';return `<div class="visual-representation">${s}</div>`;}
-        function drawSub(t,c){if(gameMode==='upper')return'';let s='';for(let i=0;i<t;i++){s+=`<span class="dot ${i>=(t-c)?'crossed':''}"></span>`;}return `<div class="visual-representation">${s}</div>`;}
-
-        function checkAnswer(btn){
-            try{
-                let val=parseInt(btn.getAttribute('data-val'));
-                const all=document.querySelectorAll('.option-btn'); if(btn.disabled)return; all.forEach(b=>b.disabled=true);
-                if(val===currentAnswer){
-                    btn.style.backgroundColor='#2ecc71'; btn.style.color='white'; btn.style.transform='scale(1.1)'; playSound('correct'); score+=10; coins+=2;
-                    let projX=canvas.width*0.15, projY=groundLevel-30; ctx.fillStyle='orange'; ctx.beginPath();ctx.arc(projX,projY,10,0,Math.PI*2);ctx.fill();
-                    setTimeout(()=>{if(enemies.length>0){createExp(enemies[0].x,enemies[0].y);enemies.shift();playSound('wrong');}},200);
-                    updateHUD(); setTimeout(generateNewQuestion,800);
-                } else {
-                    btn.style.backgroundColor='#e74c3c'; btn.style.color='white'; playSound('wrong');
-                    document.getElementById('controls-area').classList.add('shake'); setTimeout(()=>{document.getElementById('controls-area').classList.remove('shake'); all.forEach(b=>{b.disabled=false;b.style.backgroundColor='#ecf0f1';b.style.color='var(--primary)';b.style.transform='scale(1)';});},500);
-                }
-            }catch(e){}
+            return `<div class="visual-representation">${s}</div>`;
         }
 
-        function gameLoop(t){
-            if(gameState!=='playing')return;
-            ctx.clearRect(0,0,canvas.width,canvas.height); drawEnvironment();
-            ctx.font=`${canvas.height*0.15}px Cairo`; ctx.textAlign='center'; ctx.fillText(hero.sprite,canvas.width*0.15,groundLevel+5);
-
-            if(enemies.length===0){
-                 enemies.push({x:canvas.width+50,y:groundLevel+5,speed:1.5*difficulty,sprite:['👾','👺','👹','🐉','🦖'][Math.floor(Math.random()*5)],walkOffset:0,attackTimer:0,maxAttackTime:900});
-            } else if(enemies.length<2){
-                if(enemies[enemies.length-1].x < canvas.width-250) enemies.push({x:canvas.width+50,y:groundLevel+5,speed:1.5*difficulty,sprite:['👾','👺','👹','🐉','🦖'][Math.floor(Math.random()*5)],walkOffset:0,attackTimer:0,maxAttackTime:900});
+        function drawSubtractionVisual(total, crossedCount) {
+            if(gameMode === 'upper') return '';
+            let s = '';
+            for(let i=0; i<total; i++) {
+                let isCrossed = i >= (total - crossedCount); 
+                s += `<span class="dot ${isCrossed ? 'crossed' : ''}"></span>`;
             }
+            return `<div class="visual-representation">${s}</div>`;
+        }
 
-            for(let i=0;i<enemies.length;i++){
-                let e=enemies[i], stop=castleX+40+(i*70);
-                if(e.x>stop){ e.x-=e.speed; e.walkOffset+=0.15; ctx.font=`${canvas.height*0.12}px Cairo`; ctx.fillText(e.sprite,e.x,e.y+Math.sin(e.walkOffset)*5); }
-                else {
-                    e.x=stop; ctx.font=`${canvas.height*0.12}px Cairo`; ctx.fillText(e.sprite,e.x,e.y);
-                    if(i===0){
-                        e.attackTimer++; let p=e.attackTimer/e.maxAttackTime;
-                        ctx.fillStyle="#555"; ctx.fillRect(e.x-30,e.y-70,60,8); ctx.fillStyle=p>0.7?"#e74c3c":"#2ecc71"; ctx.fillRect(e.x-30,e.y-70,60*(1-p),8);
-                        if(e.attackTimer>=e.maxAttackTime){
-                            lives--; updateHUD(); playSound('wrong'); document.getElementById('game-view').classList.add('shake'); setTimeout(()=>document.getElementById('game-view').classList.remove('shake'),400); createExp(e.x,e.y); enemies.shift(); i--;
-                            if(lives<=0){gameState='over';document.getElementById('game-container').classList.add('hidden');document.getElementById('game-over-screen').classList.remove('hidden');}
+        function checkAnswer(btn) {
+            try {
+                let val = parseInt(btn.getAttribute('data-val'));
+                const allBtns = document.querySelectorAll('.option-btn');
+                if(btn.disabled) return;
+                allBtns.forEach(b => b.disabled = true);
+                
+                if(val === currentAnswer) {
+                    btn.style.backgroundColor = '#2ecc71'; btn.style.color = 'white'; btn.style.transform = 'scale(1.1)';
+                    playSound('correct'); score += 10; coins += 2;
+                    fireProjectile();
+                    setTimeout(() => {
+                        if(enemies.length > 0) { 
+                            createExplosion(enemies[0].x, enemies[0].y); 
+                            enemies.shift(); 
+                            playSound('explosion'); 
                         }
-                    } else { ctx.font="20px Arial"; ctx.fillStyle="#fff"; ctx.fillText("⏳",e.x,e.y-60); }
+                    }, 200);
+                    updateHUD(); setTimeout(generateNewQuestion, 800);
+                } else {
+                    btn.style.backgroundColor = '#e74c3c'; btn.style.color = 'white';
+                    playSound('wrong');
+                    document.getElementById('controls-area').classList.add('shake');
+                    setTimeout(() => {
+                        document.getElementById('controls-area').classList.remove('shake');
+                        allBtns.forEach(b => { 
+                            b.disabled = false; b.style.backgroundColor = '#ecf0f1'; b.style.color = 'var(--primary)'; b.style.transform = 'scale(1)';
+                        });
+                    }, 500);
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function fireProjectile() {
+            let projX = canvas.width * 0.15; let projY = groundLevel - 30;
+            ctx.fillStyle = 'orange'; ctx.beginPath(); ctx.arc(projX, projY, 10, 0, Math.PI*2); ctx.fill();
+        }
+
+        function gameLoop(t) {
+            if(gameState !== 'playing') return;
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            drawEnvironment();
+
+            ctx.font = `${canvas.height * 0.15}px Cairo`; ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 10;
+            ctx.textAlign = 'center'; ctx.fillText(hero.sprite, canvas.width * 0.15, groundLevel + 5);
+            ctx.shadowBlur = 0;
+
+            if(enemies.length === 0) {
+                 let baseSpeed = 1.5; 
+                 enemies.push({
+                    x: canvas.width + 50, y: groundLevel + 5,
+                    speed: baseSpeed * difficulty,
+                    sprite: ['👾','👺','👹','🐉','🦖'][Math.floor(Math.random()*5)],
+                    walkOffset: 0,
+                    attackTimer: 0,
+                    maxAttackTime: 900
+                });
+            } else if (enemies.length < 2) {
+                let lastEnemy = enemies[enemies.length-1];
+                if (lastEnemy.x < canvas.width - 250) {
+                    let baseSpeed = 1.5; 
+                     enemies.push({
+                        x: canvas.width + 50, y: groundLevel + 5,
+                        speed: baseSpeed * difficulty,
+                        sprite: ['👾','👺','👹','🐉','🦖'][Math.floor(Math.random()*5)],
+                        walkOffset: 0,
+                        attackTimer: 0,
+                        maxAttackTime: 900
+                    });
                 }
             }
-            for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.x+=p.vx;p.y+=p.vy;p.life-=0.04;ctx.globalAlpha=p.life;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();if(p.life<=0)particles.splice(i,1);}
-            ctx.globalAlpha=1; requestAnimationFrame(gameLoop);
+
+            for(let i=0; i<enemies.length; i++) {
+                let e = enemies[i];
+                let stopPoint = castleX + 40 + (i * 70);
+
+                if (e.x > stopPoint) {
+                    e.x -= e.speed;
+                    e.walkOffset += 0.15;
+                    let bounce = Math.sin(e.walkOffset) * 5;
+                    ctx.font = `${canvas.height * 0.12}px Cairo`;
+                    ctx.fillText(e.sprite, e.x, e.y + bounce);
+                } else {
+                    e.x = stopPoint;
+                    ctx.font = `${canvas.height * 0.12}px Cairo`;
+                    ctx.fillText(e.sprite, e.x, e.y);
+
+                    if (i === 0) {
+                        e.attackTimer++;
+                        let barWidth = 60;
+                        let percent = e.attackTimer / e.maxAttackTime;
+                        ctx.fillStyle = "#555";
+                        ctx.fillRect(e.x - barWidth/2, e.y - 70, barWidth, 8);
+                        ctx.fillStyle = percent > 0.7 ? "#e74c3c" : "#2ecc71";
+                        ctx.fillRect(e.x - barWidth/2, e.y - 70, barWidth * (1-percent), 8);
+
+                        if (e.attackTimer >= e.maxAttackTime) {
+                            lives--; updateHUD(); playSound('wrong');
+                            document.getElementById('game-view').classList.add('shake');
+                            setTimeout(()=>document.getElementById('game-view').classList.remove('shake'), 400);
+                            createExplosion(e.x, e.y);
+                            enemies.shift(); 
+                            i--; 
+                            if(lives <= 0) {
+                                gameState = 'over';
+                                document.getElementById('game-container').classList.add('hidden');
+                                document.getElementById('game-over-screen').classList.remove('hidden');
+                            }
+                        }
+                    } else {
+                         ctx.font = "20px Arial"; ctx.fillStyle = "#fff";
+                         ctx.fillText("⏳", e.x, e.y - 60);
+                    }
+                }
+            }
+
+            for(let i=particles.length-1; i>=0; i--) {
+                let p = particles[i]; p.x += p.vx; p.y += p.vy; p.life -= 0.04;
+                ctx.globalAlpha = p.life; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
+                if(p.life<=0) particles.splice(i,1);
+            }
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(gameLoop);
         }
-        function createExp(x,y){for(let i=0;i<25;i++)particles.push({x:x,y:y-20,vx:(Math.random()-0.5)*15,vy:(Math.random()-0.5)*15,life:1,size:Math.random()*8+2,color:`hsl(${Math.random()*60+10},100%,50%)`});}
-        
-        // المتجر
-        function renderShop(){const c=document.getElementById('shop-items-container');c.innerHTML='';shopItems.forEach(i=>{let o=savedData.boughtSkins.includes(i.icon);let d=document.createElement('div');d.className=`shop-item ${savedData.currentSkin===i.icon?'selected':''} ${!o?'locked':''}`;d.innerHTML=`<div class="shop-icon">${i.icon}</div><div>${o?'✔':toArabicNum(i.price)}</div>`;d.onclick=()=>{if(o){savedData.currentSkin=i.icon;hero.sprite=i.icon;renderShop();updateHUD();}else if(coins>=i.price){coins-=i.price;savedData.boughtSkins.push(i.icon);savedData.currentSkin=i.icon;hero.sprite=i.icon;playSound('correct');renderShop();updateHUD();}};c.appendChild(d);});}
-        function showShop(){document.getElementById('start-screen').classList.add('hidden');document.getElementById('shop-screen').classList.remove('hidden');renderShop();}
-        function closeShop(){document.getElementById('shop-screen').classList.add('hidden');document.getElementById('start-screen').classList.remove('hidden');}
-        function setMode(m){gameMode=m;document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));document.getElementById('mode-'+m).classList.add('active');}
-        function resetGame(){document.getElementById('game-over-screen').classList.add('hidden');startGame();}
+
+        function createExplosion(x, y) {
+            for(let i=0; i<25; i++) {
+                particles.push({
+                    x: x, y: y - 20, vx: (Math.random()-0.5) * 15, vy: (Math.random()-0.5) * 15,
+                    life: 1, size: Math.random()*8+2, color: `hsl(${Math.random()*60 + 10}, 100%, 50%)`
+                });
+            }
+        }
+
+        function renderShop() {
+            const c = document.getElementById('shop-items-container'); c.innerHTML = '';
+            shopItems.forEach(item => {
+                let owned = savedData.boughtSkins.includes(item.icon);
+                let div = document.createElement('div');
+                div.className = `shop-item ${savedData.currentSkin === item.icon ? 'selected' : ''} ${!owned ? 'locked' : ''}`;
+                div.innerHTML = `<div class="shop-icon">${item.icon}</div><div>${owned ? '✔' : toArabicNum(item.price)}</div>`;
+                div.onclick = () => {
+                    if(owned) { savedData.currentSkin = item.icon; hero.sprite = item.icon; renderShop(); updateHUD(); }
+                    else if(coins >= item.price) {
+                        coins -= item.price; savedData.boughtSkins.push(item.icon); savedData.currentSkin = item.icon; hero.sprite = item.icon;
+                        playSound('correct'); renderShop(); updateHUD();
+                    }
+                }
+                c.appendChild(div);
+            });
+        }
+        function showShop() { document.getElementById('start-screen').classList.add('hidden'); document.getElementById('shop-screen').classList.remove('hidden'); renderShop(); }
+        function closeShop() { document.getElementById('shop-screen').classList.add('hidden'); document.getElementById('start-screen').classList.remove('hidden'); }
+        function setMode(m) { gameMode = m; document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active')); document.getElementById('mode-'+m).classList.add('active'); }
+        function resetGame() { document.getElementById('game-over-screen').classList.add('hidden'); startGame(); }
     </script>
 </body>
 </html>
