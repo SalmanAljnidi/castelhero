@@ -25,9 +25,7 @@
         .btn:active{transform:translateY(5px);box-shadow:none}
         .btn-gold{background:linear-gradient(to bottom,#f1c40f,#f39c12);color:var(--primary);box-shadow:0 5px 0 #d35400}
         .btn-blue{background:#3498db;box-shadow:0 5px 0 #2980b9}
-        /* زر التثبيت - يظهر دائماً */
         .btn-install{background:#9b59b6;box-shadow:0 5px 0 #8e44ad;display:block} 
-        
         .footer-credits{position:absolute;bottom:15px;width:100%;text-align:center;font-size:0.9rem;color:#ccc}
         .mode-select{display:flex;gap:10px;margin-bottom:15px;width:90%;max-width:400px}
         .mode-btn{flex:1;padding:10px;opacity:0.7;border:2px solid rgba(255,255,255,0.2);color:white;background:rgba(0,0,0,0.2);border-radius:10px;cursor:pointer;font-family:'Cairo'}
@@ -59,20 +57,16 @@
 <body>
     <div id="start-screen" class="screen">
         <h1 style="margin-top:40px">حارس القلعة الحسابية</h1>
-        
         <p style="margin:5px;color:#ecf0f1">اختر المرحلة:</p>
         <div class="mode-select">
             <button id="mode-lower" class="mode-btn active" onclick="setMode('lower')">الصفوف الأولية</button>
             <button id="mode-upper" class="mode-btn" onclick="setMode('upper')">الصفوف العليا</button>
         </div>
-        
         <button class="btn" onclick="initAudioAndStart()">ابدأ التحدي! ⚔️</button>
         <button class="btn btn-gold" onclick="showShop()">المتجر 🛒</button>
-        
         <button id="install-btn" class="btn btn-install" onclick="installApp()">
             <i class="fas fa-download"></i> تثبيت اللعبة
         </button>
-
         <div class="footer-credits">
             <div class="credits-name">فكرة وتصميم: أ. سلمان الجنيدي</div>
             <div class="social-icons">
@@ -115,25 +109,13 @@
     </div>
 
     <script>
-        // --- كود التثبيت المضمون ---
+        // --- كود التثبيت ---
         if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./service-worker.js'); }); }
-        
         let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-        });
-
+        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
         function installApp() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => { deferredPrompt = null; });
-            } else {
-                // تعليمات يدوية إذا لم يتعرف المتصفح
-                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-                if (isIOS) alert("لتثبيت اللعبة على الآيفون:\n1. اضغط زر المشاركة (سهم للأعلى) ⬆️\n2. اختر 'إضافة إلى الصفحة الرئيسية' 📱");
-                else alert("لتثبيت اللعبة:\nاضغط على خيارات المتصفح (الثلاث نقاط) ⁝\nثم اختر 'تثبيت التطبيق' أو 'Add to Home Screen' 📲");
-            }
+            if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; }); } 
+            else { const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent); if (isIOS) alert("لتثبيت اللعبة على الآيفون:\n1. اضغط زر المشاركة ⬆️\n2. اختر 'إضافة إلى الصفحة الرئيسية' 📱"); else alert("لتثبيت اللعبة:\nاضغط على خيارات المتصفح (الثلاث نقاط) ⁝\nثم اختر 'تثبيت التطبيق' أو 'Add to Home Screen' 📲"); }
         }
 
         // --- اللعبة ---
@@ -175,6 +157,9 @@
         function updateHUD(){ document.getElementById('lives-disp').innerText=toArabicNum(lives); document.getElementById('score-disp').innerText=toArabicNum(score); document.getElementById('shop-coins-disp').innerText=toArabicNum(coins); document.getElementById('final-score').innerText=toArabicNum(score); localStorage.setItem('mathHero_v14',JSON.stringify({coins,boughtSkins:savedData.boughtSkins,currentSkin:savedData.currentSkin})); }
 
         function generateNewQuestion(){
+            document.getElementById('question-box').classList.remove('locked-q'); // فتح القفل
+            document.getElementById('q-visual').style.visibility = 'visible';
+            
             let n1,n2,vis='';
             if(gameMode==='lower'){
                 if(Math.random()>0.5){ n1=Math.floor(Math.random()*6); n2=Math.floor(Math.random()*(11-n1)); currentAnswer=n1+n2; document.getElementById('q-text').innerText=`${toArabicNum(n1)} + ${toArabicNum(n2)} = ؟`; vis=drawDots(n1,false)+'<span style="font-size:1.5rem">+</span>'+drawDots(n2,false); }
@@ -192,15 +177,41 @@
 
         function checkAnswer(btn){
             try{
-                let val=parseInt(btn.getAttribute('data-val')); const all=document.querySelectorAll('.option-btn'); if(btn.disabled)return; all.forEach(b=>b.disabled=true);
+                if(btn.disabled || document.getElementById('question-box').classList.contains('locked-q')) return;
+                
+                let val=parseInt(btn.getAttribute('data-val'));
+                const all=document.querySelectorAll('.option-btn');
+                
+                // قفل الأزرار
+                all.forEach(b=>b.disabled=true);
+                document.getElementById('question-box').classList.add('locked-q');
+
                 if(val===currentAnswer){
+                    // إجابة صحيحة
                     btn.style.backgroundColor='#2ecc71'; btn.style.color='white'; btn.style.transform='scale(1.1)'; playSound('correct'); score+=10; coins+=2;
                     let px=canvas.width*0.15, py=groundLevel-30; ctx.fillStyle='orange'; ctx.beginPath();ctx.arc(px,py,10,0,Math.PI*2);ctx.fill();
-                    setTimeout(()=>{if(enemies.length>0){createExp(enemies[0].x,enemies[0].y);enemies.shift();playSound('wrong');}},200);
+                    setTimeout(()=>{if(enemies.length>0){createExp(enemies[0].x,enemies[0].y);enemies.shift();playSound('correct');}},200);
                     updateHUD(); setTimeout(generateNewQuestion,800);
                 } else {
+                    // إجابة خاطئة
                     btn.style.backgroundColor='#e74c3c'; btn.style.color='white'; playSound('wrong');
-                    document.getElementById('controls-area').classList.add('shake'); setTimeout(()=>{document.getElementById('controls-area').classList.remove('shake'); all.forEach(b=>{b.disabled=false;b.style.backgroundColor='#ecf0f1';b.style.color='var(--primary)';b.style.transform='scale(1)';});},500);
+                    
+                    // تلوين الإجابة الصحيحة بالأخضر
+                    all.forEach(b => {
+                        if(parseInt(b.getAttribute('data-val')) === currentAnswer) {
+                            b.style.backgroundColor = '#2ecc71'; b.style.color = 'white';
+                        }
+                    });
+
+                    // رسالة توضيحية
+                    document.getElementById('q-text').innerHTML = `<span style="color:#e74c3c;font-size:1.5rem">خطأ! الصحيح: ${toArabicNum(currentAnswer)}</span>`;
+                    document.getElementById('q-visual').style.visibility = 'hidden';
+                    
+                    document.getElementById('controls-area').classList.add('shake');
+                    setTimeout(()=>{
+                        document.getElementById('controls-area').classList.remove('shake');
+                        generateNewQuestion(); // سؤال جديد
+                    }, 2000); // انتظار ثانيتين
                 }
             }catch(e){}
         }
