@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>حارس القلعة الحسابية | سلمان الجنيدي</title>
+    <title>حارس القلعة</title>
     
     <link rel="manifest" href="manifest.json">
     
@@ -109,7 +109,6 @@
 
     <script>
         // --- تسجيل Service Worker (للتثبيت) ---
-        // هذا الكود هو المسؤول عن تشغيل الملف الثالث الذي يجعل اللعبة قابلة للتثبيت
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./service-worker.js')
@@ -118,7 +117,7 @@
             });
         }
 
-        // --- منطق اللعبة ---
+        // --- منطق اللعبة (نفس المنطق المعتمد: وحش واحد، 15 ثانية، طرح بالدوائر) ---
         let audioCtx;
         function initAudio() { if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==='suspended') audioCtx.resume(); }
         function playSound(t) { if(!audioCtx)return; const o=audioCtx.createOscillator(),g=audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); if(t==='correct'){o.type='sine';o.frequency.setValueAtTime(500,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(1000,audioCtx.currentTime+0.1);g.gain.setValueAtTime(0.3,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.3);o.start();o.stop(audioCtx.currentTime+0.3);}else{o.type='sawtooth';o.frequency.setValueAtTime(150,audioCtx.currentTime);g.gain.setValueAtTime(0.3,audioCtx.currentTime);g.gain.linearRampToValueAtTime(0.01,audioCtx.currentTime+0.3);o.start();o.stop(audioCtx.currentTime+0.3);} }
